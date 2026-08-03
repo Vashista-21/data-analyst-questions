@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Data Analyst Interview Prep</title>
+<meta name="description" content="Interview-style practice for data analyst roles: SQL, A/B testing, guesstimates, statistics, Python and product metrics." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+<canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+<!-- ============ LOGIN ============ -->
+<section id="view-login" class="view view-login">
+  <div class="login-card">
+    <div class="brand">
+      <span class="brand-mark">DA</span>
+      <div>
+        <h1>Data Analyst Interview Prep</h1>
+        <p class="muted">SQL &middot; A/B Testing &middot; Guesstimates &middot; Statistics &middot; Python &middot; Product Metrics</p>
+      </div>
+    </div>
+
+    <form id="login-form" autocomplete="off">
+      <label for="login-name">Enter your name to start or resume</label>
+      <div class="login-row">
+        <input id="login-name" type="text" placeholder="e.g. Vashista" maxlength="40" required />
+        <button type="submit" class="btn btn-primary">Start</button>
+      </div>
+      <p id="login-error" class="form-error" hidden></p>
+    </form>
+
+    <div id="profile-list-wrap" hidden>
+      <p class="section-label">Saved progress on this browser</p>
+      <div id="profile-list" class="profile-list"></div>
+    </div>
+
+    <ul class="login-points">
+      <li>Free-text answers graded on the concepts you mention, not exact wording.</li>
+      <li>Every question shows the model answer and the approach an interviewer expects.</li>
+      <li>Points, streaks, levels and badges are saved against your name.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app-shell" hidden>
+  <header class="topbar">
+    <button id="home-btn" class="brand brand-sm" title="Back to topics">
+      <span class="brand-mark">DA</span>
+      <span class="brand-text">Interview Prep</span>
+    </button>
+
+    <div class="topbar-stats">
+      <div class="stat" title="Total points earned">
+        <span class="stat-icon">&#9733;</span>
+        <span id="stat-points" class="stat-value">0</span>
+        <span class="stat-label">points</span>
+      </div>
+      <div class="stat" title="Current correct-answer streak">
+        <span class="stat-icon">&#128293;</span>
+        <span id="stat-streak" class="stat-value">0</span>
+        <span class="stat-label">streak</span>
+      </div>
+      <div class="stat stat-level" title="Level progress">
+        <span id="stat-level" class="stat-value">Lv 1</span>
+        <div class="level-bar"><div id="level-fill" class="level-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="topbar-user">
+      <button id="badges-btn" class="btn btn-ghost btn-sm" title="View badges">Badges <span id="badge-count">0</span></button>
+      <span id="user-chip" class="user-chip">?</span>
+      <button id="logout-btn" class="btn btn-ghost btn-sm">Switch</button>
+    </div>
+  </header>
+
+  <!-- ============ DASHBOARD ============ -->
+  <main id="view-dashboard" class="view container">
+    <div class="dash-head">
+      <div>
+        <h2 id="greeting">Welcome back</h2>
+        <p class="muted">Pick a topic. Each topic has 5 easy, 5 medium and 5 hard interview questions.</p>
+      </div>
+      <div class="dash-summary">
+        <div class="summary-tile">
+          <span id="sum-solved" class="summary-value">0</span>
+          <span class="summary-label">solved</span>
+        </div>
+        <div class="summary-tile">
+          <span id="sum-accuracy" class="summary-value">0%</span>
+          <span class="summary-label">accuracy</span>
+        </div>
+        <div class="summary-tile">
+          <span id="sum-best" class="summary-value">0</span>
+          <span class="summary-label">best streak</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <span class="section-label">Difficulty</span>
+      <div id="difficulty-filter" class="chips">
+        <button class="chip is-active" data-difficulty="all">All 15</button>
+        <button class="chip" data-difficulty="easy">Easy</button>
+        <button class="chip" data-difficulty="medium">Medium</button>
+        <button class="chip" data-difficulty="hard">Hard</button>
+      </div>
+      <div class="filter-actions">
+        <button id="export-btn" class="btn btn-ghost btn-sm">Export progress</button>
+        <button id="import-btn" class="btn btn-ghost btn-sm">Import</button>
+        <button id="reset-btn" class="btn btn-danger-ghost btn-sm">Reset progress</button>
+        <input id="import-file" type="file" accept="application/json" hidden />
+      </div>
+    </div>
+
+    <div id="topic-grid" class="topic-grid"></div>
+  </main>
+
+  <!-- ============ QUIZ ============ -->
+  <main id="view-quiz" class="view container" hidden>
+    <div class="quiz-head">
+      <button id="quiz-back" class="btn btn-ghost btn-sm">&larr; Topics</button>
+      <div class="quiz-meta">
+        <span id="quiz-topic" class="quiz-topic">SQL</span>
+        <span id="quiz-difficulty" class="pill">easy</span>
+        <span id="quiz-counter" class="muted">Question 1 of 15</span>
+      </div>
+      <div class="quiz-timer" title="Time on this question">
+        <span class="stat-icon">&#9201;</span><span id="quiz-timer">00:00</span>
+      </div>
+    </div>
+
+    <div class="progress-track"><div id="quiz-progress" class="progress-fill"></div></div>
+
+    <article class="question-card">
+      <div class="question-top">
+        <span id="question-id" class="mono muted">sql-e1</span>
+        <span id="question-points" class="pill pill-points">+10 pts</span>
+      </div>
+      <h2 id="question-prompt" class="question-prompt">Question</h2>
+      <div id="question-context" class="question-context" hidden></div>
+
+      <label for="answer-input" class="section-label">Your answer</label>
+      <textarea id="answer-input" class="answer-input" rows="7"
+        placeholder="Type your answer the way you would say it in an interview. Mention the key concepts, the metric or the query clauses you would use."></textarea>
+
+      <div class="answer-actions">
+        <button id="submit-btn" class="btn btn-primary">Submit answer</button>
+        <button id="reveal-btn" class="btn btn-outline">See the answer</button>
+        <button id="hint-btn" class="btn btn-ghost">Hint</button>
+        <div class="spacer"></div>
+        <button id="prev-btn" class="btn btn-ghost">&larr; Prev</button>
+        <button id="next-btn" class="btn btn-outline">Next &rarr;</button>
+      </div>
+      <p class="kbd-hint muted">Tip: press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to submit.</p>
+
+      <div id="hint-box" class="hint-box" hidden></div>
+
+      <section id="feedback" class="feedback" hidden>
+        <div class="feedback-head">
+          <span id="verdict-badge" class="verdict">Correct</span>
+          <div class="match-track" title="How much of the expected answer you covered">
+            <div id="match-fill" class="match-fill"></div>
+          </div>
+          <span id="match-score" class="mono muted">0%</span>
+        </div>
+
+        <div class="concept-lists">
+          <div>
+            <p class="section-label good">You covered</p>
+            <ul id="matched-list" class="concept-list"></ul>
+          </div>
+          <div>
+            <p class="section-label bad">You missed</p>
+            <ul id="missed-list" class="concept-list"></ul>
+          </div>
+        </div>
+
+        <div class="explain-block">
+          <p class="section-label">How to approach it</p>
+          <div id="approach-text" class="prose"></div>
+        </div>
+
+        <div class="explain-block">
+          <p class="section-label">Model answer</p>
+          <div id="model-answer" class="prose"></div>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <!-- ============ SUMMARY ============ -->
+  <main id="view-summary" class="view container" hidden>
+    <div class="summary-card">
+      <h2 id="summary-title">Set complete</h2>
+      <p id="summary-subtitle" class="muted"></p>
+      <div class="summary-grid">
+        <div class="summary-tile lg"><span id="res-correct" class="summary-value">0</span><span class="summary-label">correct</span></div>
+        <div class="summary-tile lg"><span id="res-partial" class="summary-value">0</span><span class="summary-label">partial</span></div>
+        <div class="summary-tile lg"><span id="res-wrong" class="summary-value">0</span><span class="summary-label">to revisit</span></div>
+        <div class="summary-tile lg"><span id="res-points" class="summary-value">0</span><span class="summary-label">points earned</span></div>
+      </div>
+      <div id="summary-list" class="summary-list"></div>
+      <div class="summary-actions">
+        <button id="retry-wrong-btn" class="btn btn-primary">Retry what I missed</button>
+        <button id="summary-home-btn" class="btn btn-outline">Back to topics</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ============ BADGES MODAL ============ -->
+<div id="badge-modal" class="modal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Badges</h3>
+      <button id="badge-close" class="btn btn-ghost btn-sm">Close</button>
+    </div>
+    <div id="badge-grid" class="badge-grid"></div>
+  </div>
+</div>
+
+<div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/evaluator.js"></script>
+<script src="assets/js/rewards.js"></script>
+<script src="assets/js/bank.js"></script>
+<script src="assets/js/data/sql.js"></script>
+<script src="assets/js/data/ab-testing.js"></script>
+<script src="assets/js/data/guesstimates.js"></script>
+<script src="assets/js/data/statistics.js"></script>
+<script src="assets/js/data/python-pandas.js"></script>
+<script src="assets/js/data/product-metrics.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
