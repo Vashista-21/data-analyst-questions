@@ -338,3 +338,8 @@ kbd {
   .question-card { padding: 20px; }
   .filter-actions { margin-left: 0; }
 }
+
+/* Views, modals and inline panels are toggled through the `hidden` attribute.
+   Class rules above set an explicit display (.modal and .view-login use grid),
+   which outranks the browser default for [hidden], so state this last. */
+[hidden] { display: none !important; }

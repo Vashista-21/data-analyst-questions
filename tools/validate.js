@@ -27,6 +27,23 @@ const DAQ = sandbox.window.DAQ;
 const errors = [];
 const ids = new Set();
 
+/* Views and modals are shown and hidden through the `hidden` attribute, but
+ * class rules that set `display` outrank the browser default for [hidden].
+ * Without an explicit override, hidden panels stay on screen. */
+const css = fs.readFileSync(path.join(root, 'assets/css/styles.css'), 'utf8');
+if (!/\[hidden\]\s*\{[^}]*display:\s*none\s*!important/.test(css)) {
+  errors.push('styles.css: missing "[hidden] { display: none !important; }" override');
+}
+
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const referencedIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map((m) => m[1]));
+['assets/js/app.js', 'assets/js/rewards.js'].forEach((file) => {
+  const js = fs.readFileSync(path.join(root, file), 'utf8');
+  [...js.matchAll(/(?:\bel|getElementById)\('([^']+)'\)/g)].forEach((m) => {
+    if (!referencedIds.has(m[1])) errors.push(`${file}: references missing element #${m[1]}`);
+  });
+});
+
 DAQ.topics.forEach((topic) => {
   const counts = { easy: 0, medium: 0, hard: 0 };
   if (!topic.id || !topic.name || !topic.icon || !topic.blurb) errors.push(`topic ${topic.id}: missing metadata`);
