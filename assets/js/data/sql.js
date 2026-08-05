@@ -65,89 +65,103 @@ WHERE salary &lt; (SELECT MAX(salary) FROM employees);</pre>
       <p>With two people at the top, <code>DENSE_RANK</code> still gives the correct second distinct salary, whereas <code>ROW_NUMBER</code>/<code>OFFSET 1</code> would wrongly return the duplicated top value.</p>`
     },
     {
-      id: 'sql-e3',
+      id: 'sql-e6',
       difficulty: 'easy',
-      prompt: 'Explain the difference between <code>INNER JOIN</code>, <code>LEFT JOIN</code> and <code>FULL OUTER JOIN</code>, and give one analytics situation where a LEFT JOIN is essential.',
-      hint: 'Which rows survive when there is no match on the other side?',
+      prompt: 'What is the difference between <code>UNION</code> and <code>UNION ALL</code>? Which should be your default, and what must be true of the two queries?',
+      hint: 'One of them does extra work you often do not want.',
       concepts: [
-        { label: 'INNER JOIN keeps only rows that match on both sides', any: ['inner', 'both', 'matching rows', 'intersection', 'only match'], required: true },
-        { label: 'LEFT JOIN keeps all left rows and fills NULLs for missing matches', any: ['all rows from the left', 'all left', 'left table', 'null', 'unmatched'], required: true },
-        { label: 'FULL OUTER JOIN keeps unmatched rows from both sides', any: ['full outer', 'both sides', 'union of', 'all rows from both'] },
-        { label: 'Use case: keep users with zero orders / find missing records', any: ['zero', 'no orders', 'never', 'missing', 'null check', 'anti join', 'churn', 'without'] }
+        { label: 'UNION removes duplicate rows, UNION ALL keeps every row', any: ['removes duplicate', 'deduplicat', 'distinct', 'keeps duplicate', 'all rows', 'eliminates duplicate'], required: true },
+        { label: 'UNION ALL is faster because it skips the dedupe sort', any: ['faster', 'cheaper', 'no sort', 'performance', 'less work', 'expensive'], required: true },
+        { label: 'Both need the same number of columns in the same order with compatible types', any: ['same number of column', 'compatible', 'matching column', 'same order', 'data type'], required: true },
+        { label: 'UNION stacks rows, whereas a JOIN adds columns side by side', any: ['stack', 'vertical', 'adds column', 'side by side', 'on top of'] },
+        { label: 'Default to UNION ALL unless duplicates must genuinely be removed', any: ['default', 'unless', 'by default', 'only use union when', 'prefer union all'] }
       ],
-      approach: `<p>Frame it as "which side is allowed to have nothing on the other side".</p>
+      approach: `<p>The whole answer hinges on the hidden cost of deduplication.</p>
       <ol>
-        <li><code>INNER JOIN</code>: intersection. Any row without a partner disappears, which silently drops data and is the most common analyst bug.</li>
-        <li><code>LEFT JOIN</code>: every row of the left table survives; unmatched right columns come back as <code>NULL</code>.</li>
-        <li><code>FULL OUTER JOIN</code>: both sides survive, unmatched columns are <code>NULL</code> on either side.</li>
+        <li><code>UNION</code> removes duplicate rows across the combined result. To do that the engine must sort or hash everything, which is real work on large tables.</li>
+        <li><code>UNION ALL</code> simply stacks the rows and keeps duplicates, so it is materially faster.</li>
+        <li>Both require the same number of columns, in the same order, with compatible data types. Column names come from the first query.</li>
+        <li>State the default clearly: use <code>UNION ALL</code> unless you have a specific reason to deduplicate, and be aware that <code>UNION</code> silently collapses legitimately repeated rows, which can quietly understate counts.</li>
       </ol>
-      <p>Give a concrete analytics example: counting orders per user. With an <code>INNER JOIN</code>, users with zero orders vanish and your conversion rate is inflated. A <code>LEFT JOIN</code> from users to orders keeps them, and <code>WHERE o.order_id IS NULL</code> turns it into an anti-join that isolates non-buyers.</p>`,
-      answer: `<p><strong>INNER</strong> = matches only. <strong>LEFT</strong> = all left rows plus matches, NULLs where nothing matched. <strong>FULL OUTER</strong> = every row from both tables.</p>
-      <pre>-- Orders per user, keeping users who never ordered
-SELECT u.user_id, COUNT(o.order_id) AS orders
-FROM users u
-LEFT JOIN orders o ON o.user_id = u.user_id
-GROUP BY u.user_id;
+      <p>Round it off by contrasting with a join: <code>UNION</code> stacks rows vertically, a join adds columns side by side.</p>`,
+      answer: `<p><code>UNION</code> removes duplicate rows; <code>UNION ALL</code> keeps every row. Because deduplication requires a sort or hash of the whole result, <code>UNION ALL</code> is significantly faster.</p>
+      <pre>-- Keeps duplicates, faster: the usual choice
+SELECT user_id, 'app' AS channel FROM app_orders
+UNION ALL
+SELECT user_id, 'web' AS channel FROM web_orders;
 
--- Anti-join: users who never ordered
-SELECT u.user_id
-FROM users u
-LEFT JOIN orders o ON o.user_id = u.user_id
-WHERE o.order_id IS NULL;</pre>
-      <p>Note <code>COUNT(o.order_id)</code> rather than <code>COUNT(*)</code>: it counts 0 for non-buyers instead of 1.</p>`
+-- Deduplicates across both sets
+SELECT user_id FROM app_orders
+UNION
+SELECT user_id FROM web_orders;</pre>
+      <p>Both queries must return the same number of columns, in the same order, with compatible data types; the output takes its column names from the first query. Default to <code>UNION ALL</code> and reach for <code>UNION</code> only when removing duplicates is the actual requirement, since it can otherwise collapse rows that were legitimately repeated and understate your counts.</p>`
     },
     {
-      id: 'sql-e4',
+      id: 'sql-e7',
       difficulty: 'easy',
-      prompt: 'From <code>employees(emp_id, name, department, salary)</code>, return every department with more than 5 employees along with its average salary, highest paid department first.',
-      context: 'employees(emp_id, name, department, salary)',
-      hint: 'Aggregate, then filter the aggregate, then order it.',
+      prompt: 'How does SQL treat <code>NULL</code>? Explain the difference between <code>COUNT(*)</code> and <code>COUNT(column)</code>, and why <code>NOT IN</code> returns nothing when the list contains a NULL.',
+      hint: 'NULL means unknown, and comparing anything to unknown gives unknown.',
       concepts: [
-        { label: 'GROUP BY department', any: ['group by'], required: true },
-        { label: 'COUNT to get headcount and AVG for average salary', any: ['count', 'avg', 'average'], required: true },
-        { label: 'HAVING COUNT(*) > 5 to filter the groups', any: ['having'], required: true },
-        { label: 'ORDER BY the average salary descending', any: ['order by', 'desc', 'descending', 'sort'] }
+        { label: 'NULL means unknown, so comparisons return unknown rather than true', any: ['unknown', 'never equal', 'not equal to', 'three valued', 'missing value'], required: true },
+        { label: 'Test with IS NULL and IS NOT NULL, never with = NULL', any: ['is null', 'is not null', 'cannot use', 'equals null'], required: true },
+        { label: 'COUNT(*) counts rows while COUNT(column) skips NULLs', any: ['counts rows', 'skips', 'ignores null', 'excludes null', 'non null'], required: true },
+        { label: 'SUM and AVG ignore NULLs, which changes the average denominator', any: ['avg', 'average', 'denominator', 'ignore', 'sum'], required: true },
+        { label: 'NOT IN with a NULL yields no rows; use NOT EXISTS instead', any: ['not exists', 'no rows', 'empty', 'anti join', 'left join'], required: true },
+        { label: 'COALESCE and NULLIF substitute or create NULLs deliberately', any: ['coalesce', 'nullif', 'ifnull', 'isnull', 'substitut'] }
       ],
-      approach: `<p>This is a mechanical question, so the interviewer is checking clause order and whether you filter the aggregate in the right place.</p>
+      approach: `<p>Everything follows from one idea: <code>NULL</code> is not a value, it is <strong>unknown</strong>.</p>
       <ol>
-        <li>Group by the dimension you are reporting on: <code>department</code>.</li>
-        <li>Compute both aggregates in the same pass: <code>COUNT(*)</code> and <code>AVG(salary)</code>.</li>
-        <li>Filter on the aggregate with <code>HAVING</code>, never <code>WHERE</code>.</li>
-        <li>Sort with <code>ORDER BY</code>, and alias the aggregate so the output is readable.</li>
+        <li>Any comparison with unknown is unknown, not true, which is why <code>= NULL</code> never matches and you must write <code>IS NULL</code> or <code>IS NOT NULL</code>.</li>
+        <li><code>COUNT(*)</code> counts rows; <code>COUNT(column)</code> counts non-null values, so the two differ exactly by the number of NULLs. The same applies to <code>AVG</code>, which ignores NULLs and therefore divides by fewer rows than you may expect.</li>
+        <li>The <code>NOT IN</code> trap: if the subquery returns a NULL, every comparison evaluates to unknown, so no row can qualify and the query silently returns nothing. <code>NOT EXISTS</code> or a <code>LEFT JOIN ... IS NULL</code> anti-join behaves correctly.</li>
+        <li>Close with the tools: <code>COALESCE</code> to substitute a default, <code>NULLIF</code> to turn a sentinel value such as 0 back into NULL, typically to avoid divide-by-zero.</li>
       </ol>`,
-      answer: `<pre>SELECT department,
-       COUNT(*)            AS headcount,
-       ROUND(AVG(salary),2) AS avg_salary
-FROM employees
-GROUP BY department
-HAVING COUNT(*) &gt; 5
-ORDER BY avg_salary DESC;</pre>
-      <p>Most engines let you reuse the alias in <code>ORDER BY</code>; inside <code>HAVING</code> you generally repeat the aggregate expression.</p>`
+      answer: `<p><code>NULL</code> means unknown, so any comparison with it yields unknown rather than true. That is why you test with <code>IS NULL</code> / <code>IS NOT NULL</code> and never with <code>= NULL</code>.</p>
+      <pre>-- COUNT(*) counts rows; COUNT(col) skips NULLs
+SELECT COUNT(*)        AS all_rows,       -- 100
+       COUNT(phone)    AS with_phone,     -- 63
+       AVG(rating)     AS avg_rating      -- ignores NULL ratings entirely
+FROM users;
+
+-- Trap: returns zero rows if any excluded_id is NULL
+SELECT * FROM users
+WHERE user_id NOT IN (SELECT excluded_id FROM blocklist);
+
+-- Safe equivalent
+SELECT u.* FROM users u
+WHERE NOT EXISTS (SELECT 1 FROM blocklist b WHERE b.excluded_id = u.user_id);</pre>
+      <p><code>SUM</code> and <code>AVG</code> also ignore NULLs, so an average silently divides by the non-null count. Use <code>COALESCE(value, 0)</code> to substitute a default and <code>NULLIF(denominator, 0)</code> to protect a division.</p>`
     },
     {
-      id: 'sql-e5',
+      id: 'sql-e8',
       difficulty: 'easy',
-      prompt: 'Compare <code>DELETE</code>, <code>TRUNCATE</code> and <code>DROP</code>. Which can be rolled back, and which resets identity columns?',
-      hint: 'Two of them are DDL, one is DML.',
+      prompt: 'From <code>orders(order_id, order_date, status, amount)</code>, return one row per day with <strong>separate columns</strong> for completed, cancelled and refunded order counts.',
+      context: 'orders(order_id, order_date, status, amount)  -- status: completed | cancelled | refunded',
+      hint: 'Put a CASE inside the aggregate rather than filtering in WHERE.',
       concepts: [
-        { label: 'DELETE is DML, row-by-row, supports WHERE and is transactional', any: ['delete', 'where', 'dml', 'row by row', 'rollback'], required: true },
-        { label: 'TRUNCATE removes all rows quickly and cannot take a WHERE clause', any: ['truncate', 'all rows', 'no where', 'faster', 'quick'], required: true },
-        { label: 'DROP removes the table structure itself', any: ['drop', 'structure', 'schema', 'table itself', 'definition'], required: true },
-        { label: 'DELETE logs each row and keeps identity/auto-increment; TRUNCATE resets it', any: ['auto increment', 'identity', 'reset', 'log', 'sequence'] }
+        { label: 'Use CASE inside an aggregate: conditional aggregation', any: ['case', 'conditional aggregation', 'case when'], required: true },
+        { label: 'SUM(CASE WHEN ... THEN 1 ELSE 0 END) or COUNT with CASE', any: ['then 1', 'else 0', 'sum case', 'count case', 'sum of case'], required: true },
+        { label: 'GROUP BY the date so there is one row per day', any: ['group by'], required: true },
+        { label: 'This pivots rows into columns without a PIVOT operator', any: ['pivot', 'into columns', 'cross tab', 'wide'], required: true },
+        { label: 'Filtering status in WHERE would give one status, not three columns', any: ['where', 'cannot filter', 'only one', 'lose the other', 'instead of'] }
       ],
-      approach: `<p>Sort the three commands on two axes: <strong>what is removed</strong> and <strong>how recoverable it is</strong>.</p>
+      approach: `<p>The trap is reaching for <code>WHERE status = ...</code>, which can only ever produce one status. You need all three on the same row, so the condition must live <em>inside</em> the aggregate.</p>
       <ol>
-        <li><code>DELETE</code> is DML. It removes selected rows, fires triggers, writes a log entry per row, and can be rolled back inside a transaction.</li>
-        <li><code>TRUNCATE</code> is DDL in most engines. It deallocates pages instead of deleting rows, so it is far faster, takes no <code>WHERE</code>, and typically resets auto-increment.</li>
-        <li><code>DROP</code> removes the table object itself, so columns, indexes and constraints go with it.</li>
-      </ol>
-      <p>Mention the caveat that rollback behaviour is engine dependent: PostgreSQL can roll back <code>TRUNCATE</code>, MySQL with InnoDB cannot.</p>`,
-      answer: `<table>
-      <tr><td><strong>DELETE</strong></td><td>DML, per-row, <code>WHERE</code> allowed, triggers fire, rollback-able, keeps identity counter and table structure.</td></tr>
-      <tr><td><strong>TRUNCATE</strong></td><td>DDL-style bulk removal of all rows, no <code>WHERE</code>, minimal logging, usually resets auto-increment, structure stays.</td></tr>
-      <tr><td><strong>DROP</strong></td><td>Removes the table definition, data, indexes and constraints entirely.</td></tr>
-      </table>
-      <p>Rule of thumb: <code>DELETE</code> when you need conditions or recoverability, <code>TRUNCATE</code> to reload a staging table fast, <code>DROP</code> when the table should no longer exist.</p>`
+        <li>Group by the reporting dimension, here <code>order_date</code>.</li>
+        <li>For each output column, write a <code>CASE</code> that returns 1 for the status you want and 0 otherwise, then <code>SUM</code> it. <code>COUNT(CASE WHEN ... THEN 1 END)</code> works too, because <code>COUNT</code> ignores NULLs.</li>
+        <li>Name this pattern: <strong>conditional aggregation</strong>, which is how you pivot rows into columns in plain SQL without a vendor-specific <code>PIVOT</code> operator.</li>
+        <li>Mention that the same trick computes conditional sums, for example completed revenue alongside refunded revenue in one pass.</li>
+      </ol>`,
+      answer: `<pre>SELECT order_date,
+       SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed,
+       SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled,
+       SUM(CASE WHEN status = 'refunded'  THEN 1 ELSE 0 END) AS refunded,
+       SUM(CASE WHEN status = 'completed' THEN amount END)   AS completed_revenue
+FROM orders
+GROUP BY order_date
+ORDER BY order_date;</pre>
+      <p>This is <strong>conditional aggregation</strong>: the condition sits inside the aggregate, so one pass produces several columns. Filtering with <code>WHERE status = 'completed'</code> instead would keep only one status and make the other two columns impossible.</p>
+      <p>In PostgreSQL the modern equivalent is <code>COUNT(*) FILTER (WHERE status = 'completed')</code>, which reads more clearly and does the same work.</p>`
     },
 
     /* --------------------------- MEDIUM --------------------------- */
@@ -191,35 +205,37 @@ FROM ranked
 WHERE rn = 1;      -- swap to "DELETE ... WHERE rn &gt; 1" to clean the table</pre>`
     },
     {
-      id: 'sql-m2',
+      id: 'sql-m6',
       difficulty: 'medium',
-      prompt: 'For each department, return the top 2 highest paid employees. Explain why <code>GROUP BY</code> with <code>LIMIT</code> cannot solve this.',
+      prompt: 'Explain <code>ROW_NUMBER</code>, <code>RANK</code> and <code>DENSE_RANK</code> with a tie. Then use <code>LAG</code> to show each employee\'s salary gap to the next highest earner in their department.',
       context: 'employees(emp_id, name, department, salary)',
-      hint: 'You need a per-group ranking, which is exactly what a windowed PARTITION BY gives you.',
+      hint: 'Take salaries 100, 100, 90 and write out what each function returns.',
       concepts: [
-        { label: 'Use a window function such as DENSE_RANK or ROW_NUMBER', any: ['dense rank', 'row number', 'rank', 'window'], required: true },
-        { label: 'PARTITION BY department so ranking restarts per group', any: ['partition by'], required: true },
-        { label: 'ORDER BY salary DESC inside the window', any: ['order by salary', 'salary desc', 'descending', 'order by'], required: true },
-        { label: 'Filter rank <= 2 in an outer query or CTE', any: ['2', 'where rnk', 'outer query', 'cte', 'subquery'] },
-        { label: 'LIMIT applies to the whole result, not per group', any: ['whole result', 'entire result', 'not per group', 'global', 'once', 'overall'] }
+        { label: 'ROW_NUMBER always gives unique numbers, breaking ties arbitrarily', any: ['row number', 'unique', 'arbitrar', 'no ties', '1 2 3'], required: true },
+        { label: 'RANK gives ties the same number then skips, producing 1, 1, 3', any: ['rank', 'skip', '1 1 3', 'gap in the number', 'leaves a gap'], required: true },
+        { label: 'DENSE_RANK gives ties the same number without skipping: 1, 1, 2', any: ['dense rank', 'does not skip', 'no gap', '1 1 2', 'without skipping'], required: true },
+        { label: 'All are window functions needing OVER with PARTITION BY and ORDER BY', any: ['over', 'partition by', 'order by', 'window'], required: true },
+        { label: 'LAG and LEAD read the previous or next row in the window', any: ['lag', 'lead', 'previous row', 'next row', 'preceding'], required: true },
+        { label: 'Window functions cannot be filtered in WHERE, so wrap them in a CTE', any: ['cte', 'subquery', 'outer query', 'cannot filter', 'after where'] }
       ],
-      approach: `<p>This is the standard "top N per group" pattern, and the reasoning matters as much as the query.</p>
+      approach: `<p>Answer the first half with a concrete tie, because the difference is invisible in prose.</p>
       <ol>
-        <li><code>LIMIT</code> truncates the final result set once, so it can only ever give you 2 rows in total, not 2 per department.</li>
-        <li>A window function ranks rows <em>inside</em> partitions, so the counter restarts for every department.</li>
-        <li>Window functions cannot be filtered in <code>WHERE</code> (they are computed after it), so wrap the ranking in a CTE or subquery and filter outside.</li>
-        <li>Choose the ranking function deliberately: <code>ROW_NUMBER</code> gives exactly 2 rows even on ties, <code>DENSE_RANK</code> keeps everybody tied at second place. State which behaviour you want.</li>
+        <li>Take salaries 100, 100, 90 ordered descending. <code>ROW_NUMBER</code> returns 1, 2, 3 and picks arbitrarily between the tied rows. <code>RANK</code> returns 1, 1, 3, skipping 2 because two rows occupied first place. <code>DENSE_RANK</code> returns 1, 1, 2, with no gap.</li>
+        <li>Choosing between them is a business decision: use <code>ROW_NUMBER</code> when you need exactly N rows, <code>DENSE_RANK</code> when tied records deserve the same rank, and <code>RANK</code> when the gap after a tie is meaningful, as in competition scoring.</li>
+        <li>For the second half, <code>LAG(salary) OVER (PARTITION BY department ORDER BY salary DESC)</code> pulls the previous row's salary onto the current row, so the gap is a simple subtraction. The top earner in each department has no previous row and correctly returns <code>NULL</code>.</li>
+        <li>Mention the mechanic worth knowing: window functions are evaluated after <code>WHERE</code>, so filtering on one requires a CTE or subquery.</li>
       </ol>`,
-      answer: `<pre>WITH ranked AS (
-  SELECT emp_id, name, department, salary,
-         DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS rnk
-  FROM employees
-)
-SELECT department, name, salary
-FROM ranked
-WHERE rnk &lt;= 2
+      answer: `<p>With salaries 100, 100, 90 ordered descending: <code>ROW_NUMBER</code> gives <strong>1, 2, 3</strong> and breaks the tie arbitrarily; <code>RANK</code> gives <strong>1, 1, 3</strong>, skipping 2; <code>DENSE_RANK</code> gives <strong>1, 1, 2</strong> with no gap.</p>
+      <pre>SELECT name, department, salary,
+       ROW_NUMBER()  OVER (PARTITION BY department ORDER BY salary DESC) AS rn,
+       RANK()        OVER (PARTITION BY department ORDER BY salary DESC) AS rnk,
+       DENSE_RANK()  OVER (PARTITION BY department ORDER BY salary DESC) AS dense_rnk,
+       LAG(salary)   OVER (PARTITION BY department ORDER BY salary DESC) AS next_highest,
+       LAG(salary)   OVER (PARTITION BY department ORDER BY salary DESC) - salary AS gap_to_next
+FROM employees
 ORDER BY department, salary DESC;</pre>
-      <p><code>GROUP BY department ... LIMIT 2</code> fails because <code>LIMIT</code> is applied once to the entire output after grouping, so it returns two departments rather than two employees per department. Use <code>ROW_NUMBER</code> instead of <code>DENSE_RANK</code> if you must cap the output at exactly two rows per department.</p>`
+      <p><code>LAG</code> reads the previous row within the partition and <code>LEAD</code> reads the next, so the gap is a subtraction rather than a self-join. The highest earner in each department has no preceding row, so <code>gap_to_next</code> is correctly <code>NULL</code>.</p>
+      <p>Remember that window functions are computed after <code>WHERE</code>, so any filter on the ranking has to happen in an outer query or CTE.</p>`
     },
     {
       id: 'sql-m3',
@@ -363,43 +379,37 @@ ORDER BY c.cohort_month;</pre>
       <p>Generalise to month N by replacing the interval with <code>N</code> months, or by computing a month offset and pivoting into a triangle chart.</p>`
     },
     {
-      id: 'sql-h2',
+      id: 'sql-h6',
       difficulty: 'hard',
-      prompt: 'Calculate the <strong>median</strong> salary per department without using a built-in median function.',
-      context: 'employees(emp_id, department, salary)',
-      hint: 'Rank ascending and descending; the median sits where the two ranks meet.',
+      prompt: 'A dashboard query that used to return in 3 seconds now takes 4 minutes, and nobody changed the SQL. How do you diagnose it, and what would you change?',
+      hint: 'Read the plan before touching the query.',
       concepts: [
-        { label: 'ROW_NUMBER partitioned by department, ordered by salary', any: ['row number', 'partition by', 'rank'], required: true },
-        { label: 'Use COUNT per partition to know where the middle is', any: ['count', 'total rows', 'n'], required: true },
-        { label: 'Average the two middle values when the count is even', any: ['even', 'avg', 'average', 'two middle', 'both'], required: true },
-        { label: 'Handle odd counts by taking the single middle row', any: ['odd', 'middle', 'exact'], required: true },
-        { label: 'PERCENTILE_CONT(0.5) is the built-in alternative worth naming', any: ['percentile cont', 'percentile disc', 'percentile'] }
+        { label: 'Read the execution plan with EXPLAIN or EXPLAIN ANALYZE', any: ['explain', 'execution plan', 'query plan', 'analyze', 'plan'], required: true },
+        { label: 'Look for full table scans where an index should be used', any: ['full scan', 'table scan', 'seq scan', 'index', 'sequential'], required: true },
+        { label: 'Keep predicates sargable: no functions wrapped around the filtered column', any: ['sargable', 'function on the column', 'wrap', 'cannot use the index', 'left side', 'date trunc on the column'], required: true },
+        { label: 'Reduce the data touched: filter early, select only needed columns, prune partitions', any: ['select', 'only the columns', 'filter early', 'partition', 'prune', 'fewer rows'], required: true },
+        { label: 'Data volume growth and stale statistics change the plan over time', any: ['statistic', 'stale', 'grew', 'volume', 'more data', 'over time'], required: true },
+        { label: 'Watch for join fan-out and accidental cross joins', any: ['fan out', 'cross join', 'duplicate', 'join key', 'cartesian'] },
+        { label: 'For dashboards, pre-aggregate into a summary table rather than tuning forever', any: ['pre aggregat', 'materiali', 'summary table', 'aggregate table', 'incremental'] }
       ],
-      approach: `<p>The clean trick is symmetry: number the rows ascending and descending, and the median is where the two numbers are within one of each other.</p>
+      approach: `<p>Nothing changed in the SQL, so something changed <em>around</em> it. Diagnose before you optimise.</p>
       <ol>
-        <li>Window twice per department: <code>ROW_NUMBER() ... ORDER BY salary</code> and <code>ORDER BY salary DESC</code>, plus <code>COUNT(*) OVER (PARTITION BY department)</code>.</li>
-        <li>For an odd count the median row satisfies <code>rn_asc = rn_desc</code>. For an even count the two middle rows satisfy <code>ABS(rn_asc - rn_desc) = 1</code>.</li>
-        <li>Both cases are covered by keeping rows where <code>rn_asc BETWEEN cnt/2.0 AND cnt/2.0 + 1</code> and then taking <code>AVG(salary)</code>, which averages one row for odd counts and two for even.</li>
-        <li>Finish by naming <code>PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salary)</code> as what you would ship in production.</li>
+        <li><strong>Read the plan:</strong> <code>EXPLAIN ANALYZE</code> shows estimated versus actual rows. A large gap means the optimiser is working from stale statistics and has probably switched to a worse plan as the table grew.</li>
+        <li><strong>Find the expensive step:</strong> look for a full table scan on a large table, a nested loop over millions of rows, or a spill to disk during a sort or hash.</li>
+        <li><strong>Check sargability:</strong> a predicate like <code>WHERE DATE(created_at) = '2026-01-01'</code> or <code>WHERE UPPER(email) = ...</code> wraps the column in a function, so the index cannot be used. Rewrite as a range: <code>created_at &gt;= '2026-01-01' AND created_at &lt; '2026-01-02'</code>.</li>
+        <li><strong>Reduce what is touched:</strong> filter before joining rather than after, select only the needed columns instead of <code>SELECT *</code>, and make sure partitioned or clustered tables actually prune, which requires filtering on the partition key directly.</li>
+        <li><strong>Check the joins:</strong> a duplicated key on one side causes fan-out, which both inflates results and explodes runtime.</li>
+        <li><strong>Then structural fixes:</strong> add or correct an index on the filter and join columns, refresh statistics, and for a dashboard that runs constantly, pre-aggregate into a summary table refreshed incrementally rather than recomputing from raw events on every load.</li>
       </ol>`,
-      answer: `<pre>WITH ranked AS (
-  SELECT department, salary,
-         ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary)      AS rn_asc,
-         COUNT(*)     OVER (PARTITION BY department)                      AS cnt
-  FROM employees
-)
-SELECT department,
-       AVG(salary) AS median_salary
-FROM ranked
-WHERE rn_asc BETWEEN cnt / 2.0 AND cnt / 2.0 + 1
-GROUP BY department;
+      answer: `<p>Start with <code>EXPLAIN ANALYZE</code> and compare estimated with actual rows. A big discrepancy usually means <strong>stale statistics</strong> and a plan that flipped as data volume grew, which explains a query degrading without an edit.</p>
+      <pre>-- Not sargable: the function blocks the index
+WHERE DATE(created_at) = '2026-01-01'
 
--- Production version
-SELECT department,
-       PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salary) AS median_salary
-FROM employees
-GROUP BY department;</pre>
-      <p>The <code>BETWEEN</code> window picks exactly the middle row when the count is odd and both middle rows when it is even, so a single <code>AVG</code> handles both cases.</p>`
+-- Sargable rewrite: an index range scan
+WHERE created_at &gt;= '2026-01-01'
+  AND created_at &lt;  '2026-01-02'</pre>
+      <p>Then work down the list: look for full table scans on large tables and index the filter and join columns; filter before joining rather than after; select only the columns you need instead of <code>SELECT *</code>; filter on the partition key so partition pruning actually happens; and check for join fan-out from a duplicated key, which inflates both the result and the runtime.</p>
+      <p>Finally, be honest about the architecture. A dashboard query scanning raw events on every page load will keep regressing as data grows, so the durable fix is a <strong>pre-aggregated summary table</strong> refreshed incrementally, with the dashboard reading that instead.</p>`
     },
     {
       id: 'sql-h3',

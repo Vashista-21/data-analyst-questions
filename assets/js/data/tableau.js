@@ -51,25 +51,27 @@ DAQ.registerTopic({
       <p>Default to extracts for most reporting. Choose live when the business genuinely needs up-to-the-minute data, when the source is a fast warehouse, or when the data volume is too large to extract sensibly.</p>`
     },
     {
-      id: 'tb-e3',
+      id: 'tb-e6',
       difficulty: 'easy',
-      prompt: 'What is the difference between a <strong>group</strong> and a <strong>set</strong> in Tableau?',
-      hint: 'One is a static bucket; the other is a membership test that can recompute.',
+      prompt: 'What are <strong>Measure Names</strong> and <strong>Measure Values</strong>, and what does <code>ATTR()</code> mean when Tableau puts it on a pill?',
+      hint: 'Two generated fields, and a function that tells you the field is not unique at the view level.',
       concepts: [
-        { label: 'A group combines members into a larger static bucket', any: ['group', 'combine', 'bucket', 'static', 'merge'], required: true },
-        { label: 'A set is a binary in / out classification of members', any: ['set', 'in or out', 'in out', 'membership', 'binary', 'two categories'], required: true },
-        { label: 'Computed sets are dynamic and recalculate as data changes', any: ['dynamic', 'recalculat', 'top 10', 'top n', 'condition', 'changes'], required: true },
-        { label: 'Sets can be used in calculations and combined with one another', any: ['calculation', 'combine', 'combined set', 'union', 'intersect'] }
+        { label: 'Measure Values is a generated field containing every measure in the source', any: ['generated', 'every measure', 'all measures', 'built in', 'placeholder'], required: true },
+        { label: 'Measure Names is the matching dimension listing those measure names', any: ['measure names', 'dimension', 'names of', 'labels'], required: true },
+        { label: 'Together they display several measures in one view or on one axis', any: ['several measures', 'multiple measures', 'one view', 'same axis', 'side by side'], required: true },
+        { label: 'Tableau aggregates by default; disaggregating shows every underlying row', any: ['aggregat', 'disaggregat', 'every row', 'underlying row', 'by default'], required: true },
+        { label: 'ATTR returns the value if it is the same for all rows, otherwise an asterisk', any: ['same value', 'unique', 'asterisk', 'more than one value', 'only one value'], required: true },
+        { label: 'An asterisk means the field is below the granularity of the view', any: ['granularity', 'level of detail', 'not unique', 'multiple values', 'below the'] }
       ],
-      approach: `<p>Contrast them on <strong>what they produce</strong> and <strong>whether they update</strong>.</p>
+      approach: `<p>These are three small things that confuse people daily, so answer each crisply.</p>
       <ol>
-        <li>A <strong>group</strong> merges several members of one dimension into a bigger bucket, for example five cities into "South". It is static: a new city does not join the group by itself.</li>
-        <li>A <strong>set</strong> splits members into just two categories, in and out. A constant set is a fixed list, but a <strong>computed set</strong> is defined by a condition or a top N rule and recalculates as the data changes.</li>
-        <li>Add the capability difference: sets can be referenced inside calculated fields, combined with other sets, and used for in/out analysis, which is how you build "top 10 customers versus everyone else" comparisons.</li>
+        <li><strong>Measure Values</strong> is a generated field holding every measure in the data source; <strong>Measure Names</strong> is the matching dimension holding their names. Together they let one view show several measures at once, which is how you build a multi-measure text table or bars for sales and profit side by side.</li>
+        <li><strong>Aggregation:</strong> Tableau aggregates measures by default, so a pill reads <code>SUM(Sales)</code>. Turning aggregation off disaggregates the view and draws a mark per underlying row, which is useful for a scatter plot of raw records and disastrous on a large table.</li>
+        <li><strong>ATTR:</strong> it returns the value when every row at that level of detail shares the same value, and an asterisk when they do not. Seeing <code>*</code> is a signal, not an error: the field varies below the granularity of your view.</li>
       </ol>`,
-      answer: `<p>A <strong>group</strong> combines dimension members into one larger, static bucket, such as rolling five cities into "South". New members do not join automatically.</p>
-      <p>A <strong>set</strong> is a binary in / out classification. A computed set is dynamic: "top 10 customers by sales" recalculates as the data changes, and a condition-based set re-evaluates the same way.</p>
-      <p>Sets are also more powerful downstream. You can use them inside a calculation, show them as in/out on a shelf to compare a segment against everyone else, and build combined sets with union or intersection logic. Use a group to tidy up messy labels, and a set when membership is a question the data should answer.</p>`
+      answer: `<p><strong>Measure Values</strong> is a generated field containing every measure in the source, and <strong>Measure Names</strong> is the corresponding dimension holding their names. Dragging them into a view is how you show several measures at once, such as a text table of sales, profit and quantity, or two measures on one shared axis.</p>
+      <p>Tableau <strong>aggregates</strong> measures by default, which is why pills read <code>SUM(Sales)</code>. Disaggregating draws one mark per underlying row — right for a scatter plot of individual records, wrong for anything large.</p>
+      <p><code>ATTR()</code> returns the value if it is the same for every row at the view's level of detail, and an asterisk if more than one value exists. Tableau applies it automatically when you place a dimension where it expects an aggregate, so an asterisk means the field varies below the granularity of the view rather than that something is broken.</p>`
     },
     {
       id: 'tb-e4',
@@ -100,27 +102,27 @@ END</pre>
       <p>Typical uses are swapping the displayed measure, driving a dynamic top N, and setting a what-if threshold on a reference line. The main limitation is that a parameter holds one value at a time, so genuine multi-select still needs a filter.</p>`
     },
     {
-      id: 'tb-e5',
+      id: 'tb-e7',
       difficulty: 'easy',
-      prompt: 'Name the different <strong>types of filters</strong> in Tableau and say what each one acts on.',
-      hint: 'They differ by where in the pipeline they are applied.',
+      prompt: 'What is the difference between a <code>.twb</code>, a <code>.twbx</code> and a <code>.hyper</code> file? And how do Tableau Desktop, Server, Online and Public differ?',
+      hint: 'One of these file types contains the data and one only points at it.',
       concepts: [
-        { label: 'Extract and data source filters limit the data before it reaches the workbook', any: ['extract filter', 'data source filter', 'before', 'limit the data', 'reduce the data'], required: true },
-        { label: 'Context filters create a temporary subset that later filters work on', any: ['context filter', 'temporary', 'subset', 'context'], required: true },
-        { label: 'Dimension filters act on members and measure filters act after aggregation', any: ['dimension filter', 'measure filter', 'after aggregation', 'aggregated'], required: true },
-        { label: 'Table calculation filters hide marks without changing the calculation', any: ['table calc', 'hide', 'without removing', 'late', 'last'] },
-        { label: 'They are applied in a fixed order, which changes the result', any: ['order', 'sequence', 'pipeline', 'hierarchy', 'applied in'] }
+        { label: 'A .twb is XML that references the data source but does not contain data', any: ['xml', 'reference', 'does not contain', 'points to', 'only the workbook', 'no data'], required: true },
+        { label: 'A .twbx is a packaged workbook bundling the extract and resources', any: ['packaged', 'bundle', 'includes the data', 'zip', 'self contained', 'contains the extract'], required: true },
+        { label: 'A .hyper file is the extract data itself', any: ['hyper', 'extract file', 'data engine', 'the extract'], required: true },
+        { label: 'Desktop authors, Server and Online host and share, Public is free hosting', any: ['desktop', 'server', 'online', 'public', 'publish', 'author'], required: true },
+        { label: 'Server is self-hosted while Online is the cloud version', any: ['self hosted', 'on premise', 'cloud', 'hosted by tableau', 'saas'] },
+        { label: 'Anything on Tableau Public is visible to everyone, so never use company data', any: ['anyone', 'everyone', 'visible', 'confidential', 'never', 'not private'], required: true }
       ],
-      approach: `<p>List them <strong>in pipeline order</strong> rather than at random, because the order is the actual insight.</p>
+      approach: `<p>Two quick lists, and one warning that interviewers like to hear unprompted.</p>
       <ol>
-        <li><strong>Extract filters</strong> limit what goes into the extract at all.</li>
-        <li><strong>Data source filters</strong> apply to every worksheet using that source, and are the usual place for security or scope rules.</li>
-        <li><strong>Context filters</strong> materialise a temporary subset, so everything after them sees only that subset.</li>
-        <li><strong>Dimension filters</strong> keep or drop members; <strong>measure filters</strong> run after aggregation, so they filter on aggregate values.</li>
-        <li><strong>Table calculation filters</strong> apply last and only hide marks, leaving the calculation itself untouched.</li>
+        <li><strong>Files:</strong> a <code>.twb</code> is XML describing the workbook and pointing at a data source, so sending one to a colleague without access to that source gives them nothing. A <code>.twbx</code> packages the workbook together with the extract and any local resources, which is what you send for sharing. A <code>.hyper</code> file is the extract itself, Tableau's columnar data format.</li>
+        <li><strong>Products:</strong> Desktop is where you author. Server is the self-hosted platform for publishing, scheduling refreshes and controlling permissions. Online is the same thing hosted by Tableau in the cloud. Public is the free hosting tier.</li>
+        <li><strong>The warning:</strong> anything published to Tableau Public is visible to anyone on the internet and downloadable, so it must never carry company data. Saying this unprompted signals you have thought about governance.</li>
       </ol>`,
-      answer: `<p>In the order Tableau applies them: <strong>extract filters</strong> limit what enters the extract, <strong>data source filters</strong> apply to every sheet on that source, <strong>context filters</strong> create a temporary subset for everything downstream, <strong>dimension filters</strong> keep or remove members, <strong>measure filters</strong> run after aggregation so they can filter on <code>SUM</code> or <code>AVG</code>, and <strong>table calculation filters</strong> apply last and only hide marks.</p>
-      <p>The order matters in practice. A dimension filter does not shrink a <code>FIXED</code> level of detail expression, but a context filter does. A table calc filter hides a row without changing a running total, whereas a dimension filter would recompute it.</p>`
+      answer: `<p><strong>Files.</strong> A <code>.twb</code> is XML that describes the workbook and references the data source but contains no data. A <code>.twbx</code> is a packaged workbook that bundles the extract and local resources, which is what you share with someone who lacks access to the source. A <code>.hyper</code> file is the extract data itself, in Tableau's columnar format.</p>
+      <p><strong>Products.</strong> Desktop is the authoring tool. Server is the self-hosted platform for publishing, scheduled refreshes, permissions and row-level security. Online is the same platform hosted by Tableau in the cloud. Public is free hosting for personal work.</p>
+      <p>The governance point: anything on Tableau Public is visible to everyone and can be downloaded, so it is never appropriate for company data. A packaged <code>.twbx</code> also carries the data inside it, which makes it easy to leak by email.</p>`
     },
 
     /* --------------------------- MEDIUM --------------------------- */
@@ -175,27 +177,28 @@ SUM([Sales]) / TOTAL(SUM([Sales]))</pre>
       <p>Today the default is relationships. Use a physical join when you truly need a single flat table, for example for a row-level calculation that spans both tables, and use blending only across sources that cannot sit in one model.</p>`
     },
     {
-      id: 'tb-m3',
+      id: 'tb-m6',
       difficulty: 'medium',
-      prompt: 'What is a <strong>context filter</strong>, and give two situations where you genuinely need one.',
-      hint: 'It materialises a temporary subset before the rest of the pipeline runs.',
+      prompt: 'Build a <strong>Top N products</strong> view where the user chooses N with a parameter. What goes wrong once the user also filters by region, and how do you fix it?',
+      hint: 'Top N ranks across everything unless you tell Tableau otherwise.',
       concepts: [
-        { label: 'A context filter creates a temporary subset before other filters run', any: ['temporary', 'subset', 'before other', 'first', 'materialis', 'materializ'], required: true },
-        { label: 'Everything downstream sees only the context, including FIXED LODs', any: ['fixed', 'level of detail', 'downstream', 'lod', 'sees only'], required: true },
-        { label: 'It makes a top N filter operate within the filtered subset', any: ['top n', 'top 10', 'within', 'recalculat', 'ranked'], required: true },
-        { label: 'Percent of total and similar totals then reflect the subset', any: ['percent of total', 'total', 'denominator', 'share'] },
-        { label: 'It has a cost, so do not add context filters everywhere', any: ['cost', 'performance', 'expensive', 'overhead', 'slow', 'temporary table'] }
+        { label: 'Create an integer parameter and reference it in the top N filter or set', any: ['parameter', 'integer', 'top n filter', 'set', 'reference'], required: true },
+        { label: 'A computed set or an INDEX / RANK table calc makes N dynamic', any: ['computed set', 'index', 'rank', 'table calc', 'dynamic'], required: true },
+        { label: 'By default the ranking is computed across all data, ignoring the region filter', any: ['across all', 'all data', 'global', 'ignores', 'whole data'], required: true },
+        { label: 'Symptom: fewer than N rows appear, or the wrong products for that region', any: ['fewer', 'gaps', 'wrong product', 'missing', 'less than n', 'blank'], required: true },
+        { label: 'Fix by promoting the region filter to a context filter so top N recomputes within it', any: ['context filter', 'recalculat', 'recomput', 'within', 'add to context'], required: true },
+        { label: 'Show the parameter control and reflect N in the title', any: ['show parameter', 'title', 'label', 'dynamic title', 'control'] }
       ],
-      approach: `<p>Explain it as <strong>promoting a filter earlier in the pipeline</strong>.</p>
+      approach: `<p>Build it, then explain the interaction failure, which is the real question.</p>
       <ol>
-        <li>Normally dimension filters run after <code>FIXED</code> LODs and independently of top N sets. A context filter runs before both, creating a temporary subset that everything downstream sees.</li>
-        <li><strong>Case one, top N:</strong> a "top 10 products" filter normally ranks across all data, so filtering to one region still shows the global top 10 with gaps. Put the region filter in context and the top 10 recalculates within that region.</li>
-        <li><strong>Case two, FIXED LODs:</strong> a <code>FIXED</code> expression ignores dimension filters by design. If you need the filter to shrink the LOD, promote it to context.</li>
-        <li>Mention the trade-off: Tableau materialises the context, which costs time, so it is not a free thing to sprinkle everywhere.</li>
+        <li><strong>Build:</strong> create an integer parameter, for example "Top N" with a range of 5 to 50. Reference it in a Top filter on the product dimension by sales, or in a computed set so you can also compare "in set" against "out of set".</li>
+        <li><strong>The failure:</strong> Tableau computes top N filters before ordinary dimension filters. So when the user picks a region, the top 10 was already chosen from the whole dataset; you then see only those global winners that happen to exist in the region, which often means five rows instead of ten, or products that are not that region's real leaders.</li>
+        <li><strong>The fix:</strong> add the region filter to <strong>context</strong>. It then runs first, creating a temporary subset, and the top N is computed within the region as the user expects.</li>
+        <li><strong>Finish:</strong> show the parameter control on the dashboard and put the value into a dynamic title, such as "Top 10 products — South", so the view always states what it is showing.</li>
       </ol>`,
-      answer: `<p>A <strong>context filter</strong> is applied before the rest of the filter pipeline. Tableau materialises a temporary subset of the data, and every later step — dimension filters, top N sets, <code>FIXED</code> level of detail expressions, percent of total — sees only that subset.</p>
-      <p>Two cases where you need it. First, <strong>top N within a selection</strong>: a top 10 products filter ranks globally, so filtering to one region leaves gaps; putting the region filter in context makes the top 10 recalculate inside the region. Second, <strong>making a filter reach a FIXED LOD</strong>, since <code>FIXED</code> ignores ordinary dimension filters and only respects context filters and higher.</p>
-      <p>The cost is real work at query time, so use context filters deliberately rather than by default.</p>`
+      answer: `<p>Create an integer <strong>parameter</strong> for N and reference it from a Top filter on the product dimension, or from a computed set if you also want an in/out comparison against everything else.</p>
+      <p>The problem appears the moment another filter is added. Top N filters are evaluated <strong>before</strong> ordinary dimension filters, so the ranking is computed across all data. Filtering to one region then shows only those global top products that exist in the region, which typically means fewer than N rows and not the region's actual leaders.</p>
+      <p>The fix is to promote the region filter to a <strong>context filter</strong>. It is applied first, so the top N recalculates within the selected region. Then show the parameter control and put N into a dynamic title so the view always states what it is displaying.</p>`
     },
     {
       id: 'tb-m4',
@@ -220,27 +223,29 @@ SUM([Sales]) / TOTAL(SUM([Sales]))</pre>
       <p><strong>Synchronise the axes</strong> whenever the two measures are the same unit. Without it the two scales are set independently and a smaller value can be drawn taller than a larger one, which misleads every reader. Leaving them unsynchronised is legitimate only when the units genuinely differ, for example currency against a percentage, and then both axes need clear labels.</p>`
     },
     {
-      id: 'tb-m5',
+      id: 'tb-m7',
       difficulty: 'medium',
-      prompt: 'What are <strong>dashboard actions</strong>, and how would you use them to make a dashboard explorable rather than just a wall of charts?',
-      hint: 'Filter, highlight, parameter, set and URL actions, each triggered by hover, select or menu.',
+      prompt: 'A daily orders line chart skips straight over days that had no orders, so a two-week outage looks like a flat line. Why does Tableau do that, and how do you fix it?',
+      hint: 'Tableau can only draw what exists as a row in the data.',
       concepts: [
-        { label: 'Filter actions pass a selection from one sheet as a filter to others', any: ['filter action', 'pass', 'selection', 'drives', 'filters other'], required: true },
-        { label: 'Highlight actions emphasise related marks without removing data', any: ['highlight', 'emphasis', 'without removing', 'keeps context', 'dim'], required: true },
-        { label: 'Parameter and set actions let a click change a calculation or membership', any: ['parameter action', 'set action', 'change a calculation', 'membership', 'click'], required: true },
-        { label: 'Actions are triggered on hover, select or menu', any: ['hover', 'select', 'menu', 'trigger', 'on click'] },
-        { label: 'Design for overview first, then detail on demand', any: ['overview', 'detail on demand', 'drill', 'summary first', 'progressive'] }
+        { label: 'Tableau only draws marks for rows that exist in the data', any: ['rows that exist', 'only draws', 'no row', 'not in the data', 'nothing to plot'], required: true },
+        { label: 'A day with no orders is a missing row, not a zero', any: ['missing row', 'zero', 'absent', 'no data', 'does not exist'], required: true },
+        { label: 'Continuous dates plus Show Missing Values pads the axis (densification)', any: ['show missing values', 'densification', 'domain padding', 'continuous', 'pad'], required: true },
+        { label: 'A date scaffold or spine joined to the data guarantees every date exists', any: ['date spine', 'scaffold', 'calendar table', 'generate', 'every date', 'cross join'], required: true },
+        { label: 'ZN or IFNULL then turns the null into a real zero', any: ['zn', 'ifnull', 'isnull', 'convert', 'treat as zero'], required: true },
+        { label: 'Decide deliberately whether a gap should read as zero or as unknown', any: ['deliberat', 'decide', 'unknown', 'should it', 'meaning', 'misleading'] }
       ],
-      approach: `<p>Give the mechanics briefly, then spend most of the answer on <strong>design intent</strong>, which is what separates a strong candidate.</p>
+      approach: `<p>Explain the cause honestly — this is not a bug — then give both fixes and say which you prefer.</p>
       <ol>
-        <li><strong>Filter action:</strong> a selection in one sheet becomes a filter on others, which is the standard master-detail pattern.</li>
-        <li><strong>Highlight action:</strong> emphasises related marks while keeping everything visible, so the user keeps context instead of losing the comparison.</li>
-        <li><strong>Parameter and set actions:</strong> a click writes a value into a parameter or changes set membership, which lets a click reshape a calculation, swap a measure, or drive a "compare selection against the rest" view.</li>
-        <li><strong>URL action:</strong> jumps to an external system with the selected value.</li>
-        <li>Tie it to structure: build overview first and detail on demand, so the landing view answers "is anything wrong" and the actions let someone drill into "where and why" without a separate report.</li>
+        <li><strong>Cause:</strong> Tableau plots the rows it is given. If no order was placed on 14 March, there is no row for 14 March, so there is no mark and the line simply connects the neighbouring points. The outage is invisible precisely because the data is absent rather than zero.</li>
+        <li><strong>Quick fix:</strong> use a continuous date axis and turn on <em>Show Missing Values</em>. Tableau pads the domain with the missing dates, which is called densification, and you can then wrap the measure in <code>ZN()</code> so the padded dates plot as zero rather than nothing.</li>
+        <li><strong>Robust fix:</strong> build a date scaffold — a calendar table containing every date — and relate or join the orders to it. Now every date genuinely exists in the data, so every view, every export and every downstream calculation agrees. This is the version I would ship, because densification is view-specific and quietly stops working when the view changes.</li>
+        <li><strong>Judgment:</strong> confirm that zero is the honest reading. If the pipeline failed rather than orders stopping, a gap is more truthful than a zero, and the chart should show a break with an annotation.</li>
       </ol>`,
-      answer: `<p><strong>Filter actions</strong> pass a selection from one sheet as a filter to others. <strong>Highlight actions</strong> emphasise related marks without removing anything, so context survives. <strong>Parameter actions</strong> and <strong>set actions</strong> write a clicked value into a parameter or change set membership, which means a click can change a calculation, swap a measure, or compare the selection against everything else. <strong>URL actions</strong> hand off to another system. Each can trigger on hover, select or menu.</p>
-      <p>The design principle is overview first, then detail on demand: the landing view should answer whether anything needs attention, and actions should carry the user into where and why. Prefer select over hover for anything that changes several sheets, since hover-driven dashboards feel unstable, and always give the user a clear way back to the unfiltered state.</p>`
+      answer: `<p>Tableau draws marks only for rows that exist. A day with no orders produces no row, so there is nothing to plot and the line simply joins the days on either side — the gap disappears instead of showing as zero.</p>
+      <p><strong>Quick fix:</strong> make the date axis continuous, enable <em>Show Missing Values</em> so Tableau pads the domain with the absent dates, and wrap the measure in <code>ZN(SUM([Orders]))</code> so those padded dates render as zero.</p>
+      <p><strong>Robust fix:</strong> join or relate the data to a <strong>date scaffold</strong> containing every date in the range, so the zeros exist in the data itself. Every view and export then agrees, whereas densification is view-specific and silently stops applying when someone changes the shelves.</p>
+      <p>One judgment call worth stating: only show zero if zero is true. If the days are missing because a pipeline failed, a visible break with an annotation is more honest than a line dropping to the floor.</p>`
     },
 
     /* ---------------------------- HARD ---------------------------- */
@@ -328,35 +333,31 @@ SUM([Sales]) / TOTAL(SUM([Sales]))</pre>
       <p>Re-record after each change so you can attribute the improvement, and keep a target in mind, typically under five seconds for an executive dashboard.</p>`
     },
     {
-      id: 'tb-h4',
+      id: 'tb-h6',
       difficulty: 'hard',
-      prompt: 'You publish one sales dashboard for 200 regional managers, and each must see only their own region. How do you implement and test this?',
-      hint: 'An entitlement table joined to the data, filtered by the logged-in user.',
+      prompt: 'You must show <strong>daily sales</strong> against <strong>monthly targets</strong> in one view. Joining the two tables inflates the target massively. Explain why and model it properly.',
+      hint: 'The two tables are at different grain, so one row gets repeated.',
       concepts: [
-        { label: 'Row-level security driven by the logged-in user', any: ['row level security', 'rls', 'user filter', 'logged in', 'per user'], required: true },
-        { label: 'Use an entitlement or user-to-region mapping table joined to the data', any: ['entitlement', 'mapping table', 'lookup table', 'user table', 'permission table'], required: true },
-        { label: 'Filter with USERNAME(), USERPRINCIPALNAME or ISMEMBEROF rather than hard-coded lists', any: ['username', 'userprincipalname', 'ismemberof', 'fullname', 'function'], required: true },
-        { label: 'Apply it as a data source filter so it cannot be removed on a sheet', any: ['data source filter', 'cannot be removed', 'every sheet', 'enforced'], required: true },
-        { label: 'Publish with the data source and prevent web edit or download from bypassing it', any: ['permission', 'download', 'web edit', 'published data source', 'bypass'] },
-        { label: 'Test by impersonating users, and confirm totals change per user', any: ['test', 'impersonat', 'view as', 'verify', 'check'] }
+        { label: 'The tables have different grain, so the join repeats the monthly row per day', any: ['different grain', 'granularity', 'repeat', 'duplicat', 'fan out', 'once per day'], required: true },
+        { label: 'A 30-day month multiplies the target by roughly 30', any: ['30', 'multipli', 'times', 'inflat', 'number of days'], required: true },
+        { label: 'Relationships keep each table at its own grain and avoid the duplication', any: ['relationship', 'own grain', 'logical layer', 'noodle', 'own granularity'], required: true },
+        { label: 'Alternative: aggregate sales to month, or allocate the target across days', any: ['aggregate', 'roll up', 'allocate', 'spread', 'divide the target', 'per day'], required: true },
+        { label: 'Blending also works because each source is aggregated before combining', any: ['blend', 'linking field', 'secondary', 'aggregated separately'], required: true },
+        { label: 'Do not paper over it with AVG, MIN or COUNT DISTINCT tricks', any: ['avg', 'average', 'min', 'distinct', 'hack', 'hide the problem'] },
+        { label: 'Reconcile the total against the source to prove the fix', any: ['reconcile', 'validate', 'check the total', 'matches', 'tie out', 'sanity'] }
       ],
-      approach: `<p>Answer in the order you would actually build it, and make clear that hard-coded filters do not scale to 200 people.</p>
+      approach: `<p>Name the cause precisely first, because "the numbers are wrong" is not a diagnosis.</p>
       <ol>
-        <li><strong>Model:</strong> create an entitlement table mapping each username to the regions they may see, and join or relate it to the sales data on region.</li>
-        <li><strong>Filter:</strong> build a calculated field comparing the entitlement row to the logged-in user, using <code>USERNAME()</code>, <code>USERPRINCIPALNAME()</code> or <code>ISMEMBEROF()</code> for group-based rules, and set it to True.</li>
-        <li><strong>Enforce:</strong> apply that as a <strong>data source filter</strong> on a published data source, not a worksheet filter, so no sheet or web edit can drop it. Set permissions so users cannot download the data or edit the workbook in ways that bypass the rule.</li>
-        <li><strong>Test:</strong> use the impersonation feature to view as several specific users, including someone with two regions and someone with none, and confirm both the marks and the totals change.</li>
-        <li><strong>Maintain:</strong> the entitlement table is data, so it can be refreshed from HR or an access system rather than edited by hand, and access reviews become a table query instead of a workbook audit.</li>
+        <li><strong>Cause:</strong> sales are one row per day, targets are one row per month. A physical join on month attaches the single target row to every daily sales row, so summing the target multiplies it by the number of days — roughly 30x. This is fan-out, and it is a grain problem rather than a Tableau problem.</li>
+        <li><strong>Preferred fix:</strong> use a <strong>relationship</strong> rather than a join. The logical layer keeps each table at its own granularity and lets Tableau aggregate each side appropriately for the view, so daily sales and monthly targets can coexist without duplication.</li>
+        <li><strong>Alternatives:</strong> aggregate sales up to month so both sides share a monthly grain; or allocate the monthly target down to a daily figure, dividing by the number of days if a flat spread is acceptable, or weighting by historical day-of-week pattern if it is not. Blending also works, because each source is aggregated separately before being combined on the linking field.</li>
+        <li><strong>What not to do:</strong> patching the total with <code>AVG</code>, <code>MIN</code> or <code>COUNT DISTINCT</code> gymnastics. It appears to fix the headline number and then breaks the moment someone filters or changes the level of detail.</li>
+        <li><strong>Prove it:</strong> reconcile the displayed total target against the source table before publishing.</li>
       </ol>`,
-      answer: `<p>Use <strong>row-level security driven by an entitlement table</strong> rather than 200 hard-coded filters or 200 copies of the workbook.</p>
-      <pre>-- entitlements(username, region), related to sales on region
-
-// Calculated field, set to True as a data source filter
-USERNAME() = [Username]
-// or, for group-based access
-ISMEMBEROF("Region - " + [Region])</pre>
-      <p>Apply the filter on a <strong>published data source</strong> as a data source filter so every worksheet inherits it and it cannot be removed on a sheet. Then set permissions so users cannot download the underlying data or web-edit around it, since a security rule that only exists in one workbook is not a security rule.</p>
-      <p>Test by impersonating specific users, including one with multiple regions and one with none, and verify the totals change and not just the visible rows. Because entitlements live in a table, access can be refreshed from an HR or IAM system and reviewed with a query.</p>`
+      answer: `<p>The two tables are at <strong>different grain</strong>: sales are daily, targets are monthly. A physical join on month attaches the one target row to every day in that month, so summing it multiplies the target by the number of days — a roughly 30x inflation. That is fan-out, a grain problem rather than a Tableau quirk.</p>
+      <p><strong>Preferred fix:</strong> model it with a <strong>relationship</strong> instead of a join. The logical layer keeps each table at its own granularity and lets Tableau aggregate each side correctly per view, so daily actuals and monthly targets can sit in one chart without duplication.</p>
+      <p><strong>Alternatives:</strong> aggregate sales to month so both sides share a grain; allocate the target down to a daily number, either flat by day count or weighted by day-of-week pattern; or blend, since blending aggregates each source separately before combining on the linking field.</p>
+      <p>Do not paper over it with <code>AVG</code> or <code>MIN</code> of the target — that fixes one number and breaks under filtering. Finally, reconcile the total target shown in the view against the source table before you publish.</p>`
     },
     {
       id: 'tb-h5',

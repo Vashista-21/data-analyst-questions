@@ -95,26 +95,28 @@ DAQ.registerTopic({
       <p><strong>Cardinality</strong> describes how the keys match, normally one-to-many. <strong>Cross-filter direction</strong> controls which way filters travel: keep it single wherever you can, because both-directions filtering creates ambiguous paths, slows things down, and can weaken row-level security.</p>`
     },
     {
-      id: 'pbi-e5',
+      id: 'pbi-e6',
       difficulty: 'easy',
-      prompt: 'Why does a model need a dedicated <strong>date table</strong>, and what is wrong with relying on Power BI\'s automatic date hierarchy?',
-      hint: 'Time intelligence functions have requirements, and auto date/time has a hidden cost.',
+      prompt: 'In Power Query, what is the difference between <strong>Merge</strong> and <strong>Append</strong>? Which join kinds does Merge offer, and what is the trap when you expand the merged column?',
+      hint: 'One adds rows, the other adds columns.',
       concepts: [
-        { label: 'Time intelligence functions require a contiguous date table with no gaps', any: ['contiguous', 'no gaps', 'continuous', 'every date', 'complete'], required: true },
-        { label: 'It must cover full years and be marked as a date table', any: ['full year', 'mark as date', 'marked as', 'whole year', 'complete year'], required: true },
-        { label: 'One shared date table filters multiple fact tables consistently', any: ['shared', 'multiple fact', 'consistent', 'one date table', 'conformed'], required: true },
-        { label: 'Auto date/time creates a hidden date table per date column and bloats the model', any: ['auto date', 'hidden', 'per date column', 'bloat', 'model size', 'every date column'], required: true },
-        { label: 'A custom date table supports fiscal calendars and custom periods', any: ['fiscal', 'custom period', 'week', 'financial year', 'holiday'] }
+        { label: 'Append stacks rows from tables with matching columns', any: ['append', 'stack', 'adds rows', 'same column', 'union', 'on top'], required: true },
+        { label: 'Merge joins tables side by side on a key and adds columns', any: ['merge', 'join', 'adds column', 'side by side', 'matching key'], required: true },
+        { label: 'Merge supports inner, left, right, full outer and both anti joins', any: ['inner', 'left outer', 'full outer', 'anti', 'right outer'], required: true },
+        { label: 'Anti joins are how you find rows with no match', any: ['anti', 'unmatched', 'no match', 'missing', 'exception'], required: true },
+        { label: 'Expanding a one-to-many merge duplicates rows, so aggregate first', any: ['expand', 'duplicat', 'one to many', 'aggregate', 'fan'], required: true },
+        { label: 'Both should preserve query folding where the source supports it', any: ['folding', 'fold', 'at the source', 'native query'] }
       ],
-      approach: `<p>Give the functional reason first, then the cost of the automatic alternative.</p>
+      approach: `<p>Frame it exactly as you would <code>UNION</code> versus <code>JOIN</code> in SQL.</p>
       <ol>
-        <li><strong>Requirement:</strong> functions like <code>TOTALYTD</code>, <code>SAMEPERIODLASTYEAR</code> and <code>DATEADD</code> need a date table that is contiguous, has no gaps, covers whole years, and is marked as a date table so the engine knows to remove filters on it correctly.</li>
-        <li><strong>Consistency:</strong> one shared date dimension lets several fact tables be filtered by the same calendar, which is what makes cross-fact comparisons possible.</li>
-        <li><strong>Cost of auto date/time:</strong> Power BI silently creates a hidden date table for every date column in the model. In a model with a dozen date columns that is a dozen hidden tables, which inflates file size and refresh time for no benefit.</li>
-        <li><strong>Flexibility:</strong> only a custom table can carry a fiscal calendar, ISO weeks, holiday flags or a custom reporting period.</li>
+        <li><strong>Append</strong> stacks rows: same columns, more rows. It is the equivalent of <code>UNION ALL</code>, used for combining January, February and March files, or app and web exports.</li>
+        <li><strong>Merge</strong> joins side by side on a key: same rows, more columns. It is the equivalent of a SQL join.</li>
+        <li><strong>Join kinds:</strong> inner, left outer, right outer, full outer, plus left anti and right anti. The anti joins are genuinely useful and have no direct button in most tools — they return only the rows with no match, which is how you find records missing from a reference table.</li>
+        <li><strong>The trap:</strong> after merging you expand the nested table column. If the key matches many rows on the other side, expanding multiplies your rows and silently inflates every subsequent sum. Aggregate the many-side inside the merge before expanding, or expand with aggregates rather than rows.</li>
       </ol>`,
-      answer: `<p>Time intelligence functions require a proper date dimension: <strong>contiguous, no gaps, covering full years</strong>, and marked as a date table. Without that, <code>TOTALYTD</code> and <code>SAMEPERIODLASTYEAR</code> return wrong or blank results. One shared date table also lets several fact tables be filtered by the same calendar consistently.</p>
-      <p>The automatic date hierarchy is the wrong substitute because Power BI creates a <strong>hidden date table for every date column</strong> in the model. A dozen date columns means a dozen hidden tables, which inflates model size and refresh time. Turning auto date/time off and building one date table is a standard first optimisation, and it is also the only way to support a fiscal calendar, ISO weeks or holiday flags.</p>`
+      answer: `<p><strong>Append</strong> stacks rows from tables with matching columns — the equivalent of <code>UNION ALL</code>, used to combine monthly files or multiple exports. <strong>Merge</strong> joins two tables side by side on a key and adds columns — the equivalent of a SQL join.</p>
+      <p>Merge offers <strong>inner, left outer, right outer, full outer, left anti and right anti</strong> joins. The anti joins return only rows with no match, which is the quickest way to find records missing from a reference or master table.</p>
+      <p>The trap is the expand step. If the key matches many rows on the other side, expanding the nested column duplicates your rows and inflates every downstream total — the same fan-out problem as in SQL. Aggregate the many-side before expanding, or expand to an aggregate rather than to rows. Where the source supports it, keep both operations foldable so the work happens at the source rather than in memory.</p>`
     },
 
     /* --------------------------- MEDIUM --------------------------- */
@@ -242,32 +244,37 @@ RETURN
       <p>One caveat to raise unprompted: an incomplete current period compared against a full prior period understates growth, so either restrict both sides to the same day count or label the visual clearly.</p>`
     },
     {
-      id: 'pbi-m5',
+      id: 'pbi-m6',
       difficulty: 'medium',
-      prompt: 'Why are <strong>bi-directional relationships</strong> and <strong>many-to-many</strong> discouraged, and what should you use instead?',
-      hint: 'Think about ambiguity, performance and security.',
+      prompt: 'Explain <code>RELATED</code>, <code>RELATEDTABLE</code> and <code>LOOKUPVALUE</code>. How would you report sales by <strong>ship date</strong> when the active relationship uses order date?',
+      hint: 'Only one relationship between two tables can be active at a time.',
       concepts: [
-        { label: 'Bi-directional filtering creates ambiguous filter paths in a model', any: ['ambigu', 'multiple path', 'unclear', 'circular', 'which path'], required: true },
-        { label: 'It degrades query performance', any: ['performance', 'slower', 'expensive', 'degrad', 'cost'], required: true },
-        { label: 'It can undermine row-level security by propagating filters unexpectedly', any: ['row level security', 'rls', 'security', 'leak', 'expose'], required: true },
-        { label: 'Prefer single direction and enable the reverse per measure with CROSSFILTER', any: ['crossfilter', 'single direction', 'per measure', 'one direction'], required: true },
-        { label: 'Resolve many-to-many with a bridge table of unique keys', any: ['bridge', 'dimension table', 'unique', 'distinct', 'intermediate'], required: true }
+        { label: 'RELATED fetches a column from the one side, and needs row context', any: ['related', 'one side', 'row context', 'from the dimension', 'single value'], required: true },
+        { label: 'RELATEDTABLE returns the related rows from the many side', any: ['relatedtable', 'many side', 'table of rows', 'related rows'], required: true },
+        { label: 'LOOKUPVALUE fetches a value without any relationship', any: ['lookupvalue', 'without a relationship', 'no relationship', 'searches'], required: true },
+        { label: 'Only one relationship between two tables can be active', any: ['one active', 'only one', 'inactive', 'active relationship'], required: true },
+        { label: 'USERELATIONSHIP inside CALCULATE activates the inactive one per measure', any: ['userelationship', 'activate', 'for that measure', 'inside calculate'], required: true },
+        { label: 'LOOKUPVALUE is slower, so prefer a real relationship or a role-playing dimension', any: ['slower', 'performance', 'prefer', 'expensive', 'role playing'] }
       ],
-      approach: `<p>Give three concrete costs, then the alternatives, so it does not sound like cargo-cult advice.</p>
+      approach: `<p>Define the three navigation functions, then answer the role-playing dimension question, which is the part interviewers actually care about.</p>
       <ol>
-        <li><strong>Ambiguity:</strong> once filters can travel both ways, a model with several related tables can have more than one path between two tables. The engine either blocks the relationship or picks a path you did not intend.</li>
-        <li><strong>Performance:</strong> bi-directional propagation expands the filter work the engine must do on every query.</li>
-        <li><strong>Security:</strong> this is the answer that stands out. Filters propagating back up a chain can reach tables that row-level security assumed were unreachable, exposing rows a role should not see.</li>
-        <li><strong>Instead:</strong> keep relationships single-direction and turn on the reverse only inside the specific measure that needs it, using <code>CROSSFILTER</code>. For a genuine many-to-many, introduce a bridge table holding the distinct keys and relate both sides to it one-to-many.</li>
+        <li><code>RELATED</code> pulls a single column value from the <em>one</em> side of a relationship, and requires row context, so it belongs in a calculated column or inside an iterator.</li>
+        <li><code>RELATEDTABLE</code> goes the other way, returning the set of related rows from the <em>many</em> side. It is typically wrapped in <code>COUNTROWS</code> or <code>SUMX</code>.</li>
+        <li><code>LOOKUPVALUE</code> fetches a value by matching column values with no relationship at all. Handy, but slower, so it is a fallback rather than a design.</li>
+        <li><strong>Ship date:</strong> a fact table with both order date and ship date can have only one active relationship to the date table. Keep order date active and create a second, inactive relationship on ship date, then activate it inside the specific measure with <code>USERELATIONSHIP</code> in <code>CALCULATE</code>.</li>
+        <li>Mention the alternative: duplicate the date table as a role-playing dimension so both dates can be sliced independently on the same page. That costs memory but avoids writing a parallel set of measures.</li>
       </ol>`,
-      answer: `<p>Three reasons. <strong>Ambiguity:</strong> bi-directional filtering can create more than one filter path between two tables, so the engine either refuses the relationship or resolves it in a way you did not intend. <strong>Performance:</strong> propagating filters in both directions adds work to every query. <strong>Security:</strong> filters travelling back up a chain can reach tables that row-level security assumed were protected, which can expose rows a role should never see.</p>
-      <pre>-- Keep the relationship single-direction, enable the reverse only where needed
-Customers With Sales =
-CALCULATE (
-    DISTINCTCOUNT ( Customer[CustomerKey] ),
-    CROSSFILTER ( Sales[CustomerKey], Customer[CustomerKey], BOTH )
-)</pre>
-      <p>For a real many-to-many, build a <strong>bridge table</strong> containing the distinct keys and relate both tables to it one-to-many, rather than declaring a many-to-many relationship. That keeps the star shape, keeps filter paths unambiguous, and leaves row-level security predictable.</p>`
+      answer: `<p><code>RELATED</code> returns a column value from the <strong>one</strong> side of a relationship and needs row context, so it is used in calculated columns and iterators. <code>RELATEDTABLE</code> returns the related rows from the <strong>many</strong> side, usually wrapped in <code>COUNTROWS</code> or <code>SUMX</code>. <code>LOOKUPVALUE</code> retrieves a value by matching columns with no relationship at all, which is convenient but slower.</p>
+      <pre>-- Calculated column on Sales, pulling from the Product dimension
+Product Category = RELATED ( Product[Category] )
+
+-- Calculated column on Customer, counting rows on the many side
+Order Count = COUNTROWS ( RELATEDTABLE ( Sales ) )
+
+-- Second relationship on ShipDate exists but is inactive
+Sales by Ship Date =
+CALCULATE ( [Total Sales], USERELATIONSHIP ( Sales[ShipDate], 'Date'[Date] ) )</pre>
+      <p>Only <strong>one relationship between two tables can be active</strong>, so keep order date active, add ship date as an inactive relationship, and switch it on inside the measure with <code>USERELATIONSHIP</code>. If users need to slice both dates independently on the same page, the alternative is a second role-playing date dimension, which costs memory but avoids maintaining a parallel set of measures.</p>`
     },
 
     /* ---------------------------- HARD ---------------------------- */
@@ -353,31 +360,33 @@ CALCULATE (
       <p>Beyond the dataset: push heavy joins and aggregations upstream into a warehouse view or a shared dataflow so the work happens once, and check the <strong>on-premises data gateway</strong> for CPU, memory and network throughput, since a saturated gateway slows every dataset behind it. Measure the refresh duration before and after, and keep monitoring it as volumes grow.</p>`
     },
     {
-      id: 'pbi-h4',
+      id: 'pbi-h7',
       difficulty: 'hard',
-      prompt: 'Your PBIX is 2 GB and barely opens. What actually drives model size, and how do you reduce it?',
-      hint: 'VertiPaq compresses columns, so cardinality is the thing that matters.',
+      prompt: 'Your report works in Power BI Desktop. Describe how it reaches business users in production, and how you would govern it once it is there.',
+      hint: 'Workspace, app, licence, gateway, and a way to promote changes safely.',
       concepts: [
-        { label: 'VertiPaq is columnar, so size is driven by column cardinality not row count', any: ['cardinality', 'column', 'not row', 'distinct value', 'columnar', 'compress'], required: true },
-        { label: 'Remove columns the report does not use', any: ['remove column', 'unused', 'drop column', 'fewer column'], required: true },
-        { label: 'Split or truncate high-cardinality columns such as datetime and GUID keys', any: ['datetime', 'split', 'truncat', 'guid', 'timestamp', 'separate the time'], required: true },
-        { label: 'Turn off auto date/time to remove hidden date tables', any: ['auto date', 'hidden', 'date hierarchy', 'off'], required: true },
-        { label: 'Replace row-level detail with aggregated tables where possible', any: ['aggregat', 'summar', 'grain', 'rollup', 'less detail'], required: true },
-        { label: 'Use VertiPaq Analyzer or DAX Studio to find the biggest columns', any: ['vertipaq analyzer', 'dax studio', 'measure', 'analyz', 'find the biggest'], required: true },
-        { label: 'Avoid storing calculated columns that could be computed upstream', any: ['calculated column', 'upstream', 'power query', 'source'] }
+        { label: 'Publish to a workspace, then distribute to consumers as an app', any: ['workspace', 'app', 'publish', 'distribut'], required: true },
+        { label: 'Separate development, test and production with deployment pipelines', any: ['deployment pipeline', 'dev', 'test', 'production', 'environment', 'stage'], required: true },
+        { label: 'Reuse one shared semantic model instead of a dataset per report', any: ['shared', 'semantic model', 'one dataset', 'reuse', 'single source', 'certifi'], required: true },
+        { label: 'Licensing: Pro per user, or Premium capacity so free users can view', any: ['pro', 'premium', 'licen', 'ppu', 'capacity'], required: true },
+        { label: 'Scheduled refresh needs a gateway for on-premises sources plus stored credentials', any: ['gateway', 'scheduled refresh', 'on premises', 'credential'], required: true },
+        { label: 'Row-level security and workspace roles control who sees what', any: ['row level security', 'rls', 'workspace role', 'permission', 'viewer'], required: true },
+        { label: 'Endorse or certify the dataset and keep the PBIX in source control', any: ['certif', 'endors', 'source control', 'version', 'git', 'promoted'] }
       ],
-      approach: `<p>Start from how the engine stores data, because that dictates every fix.</p>
+      approach: `<p>Walk the path from your laptop to a business user, then layer governance on top.</p>
       <ol>
-        <li><strong>Principle:</strong> VertiPaq stores data column by column and compresses each column by its distinct values. Model size therefore tracks <strong>cardinality</strong> far more than row count. Ten million rows of a low-cardinality column costs almost nothing; one million distinct timestamps is expensive.</li>
-        <li><strong>Measure first:</strong> run VertiPaq Analyzer, through DAX Studio or an external tool, to list columns by size. The result is usually dominated by two or three columns.</li>
-        <li><strong>Cut columns:</strong> remove anything the report does not use. Unused surrogate keys, free-text notes and audit columns are the usual offenders.</li>
-        <li><strong>Cut cardinality:</strong> split a datetime into a date column and a time column, since the pair compresses far better than the combination; round or truncate values that do not need full precision; and avoid GUID keys where an integer surrogate would do.</li>
-        <li><strong>Cut hidden weight:</strong> turn off auto date/time to remove the hidden date table generated for every date column.</li>
-        <li><strong>Cut grain:</strong> if the report only ever shows daily totals by store, store daily totals by store rather than every transaction, or add an aggregation table on top of the detail.</li>
+        <li><strong>Publish:</strong> push the report to a <strong>workspace</strong>, which is a collaboration space for the build team, then package it as an <strong>app</strong> for consumers. Consumers should get the app, not workspace access, because workspace membership carries edit rights that bypass row-level security.</li>
+        <li><strong>Environments:</strong> use separate development, test and production workspaces and move content between them with <strong>deployment pipelines</strong>, using parameter rules so each stage points at the right data source. Never edit production directly.</li>
+        <li><strong>Model reuse:</strong> publish one shared semantic model and build reports against it, rather than embedding a copy of the model in every PBIX. That is what stops five reports quietly disagreeing about revenue.</li>
+        <li><strong>Refresh:</strong> configure scheduled refresh, install and register an on-premises data gateway if any source is behind the firewall, store credentials on the dataset, and set failure notifications so a silent refresh failure does not become a stale dashboard.</li>
+        <li><strong>Licensing:</strong> authors and consumers need Pro, unless the workspace is on Premium capacity or Fabric, in which case free users can view. Premium Per User is the middle option. Knowing this matters because it determines the rollout plan.</li>
+        <li><strong>Governance:</strong> apply row-level security and test it with View as role, use workspace roles deliberately, endorse or certify the dataset so people can find the trusted one, document the refresh schedule and definitions, and keep the PBIX in source control.</li>
       </ol>`,
-      answer: `<p>VertiPaq is a <strong>columnar</strong> engine that compresses each column according to its distinct values, so model size is driven by <strong>cardinality</strong>, not row count. That reframes the whole problem: the fix is almost never "fewer rows".</p>
-      <p>Diagnose with <strong>VertiPaq Analyzer</strong> in DAX Studio, which lists columns by memory footprint; two or three columns usually account for most of the file. Then work through the levers: remove columns the report does not use, especially unused keys and free-text fields; split high-cardinality <code>datetime</code> columns into separate date and time columns, which compress dramatically better together than apart; reduce numeric precision where full precision is meaningless; replace GUID keys with integer surrogates; and turn off <strong>auto date/time</strong> so Power BI stops generating a hidden date table per date column.</p>
-      <p>If the model is still too big, change the grain: store the aggregate the report actually shows, or keep the detail in DirectQuery with an imported aggregation table on top. Finally, move calculated columns upstream into Power Query or the warehouse, since DAX-created columns compress worse than columns loaded from the source.</p>`
+      answer: `<p><strong>Path to production:</strong> publish the report to a <strong>workspace</strong>, then distribute it to consumers as an <strong>app</strong>. Consumers get the app rather than workspace membership, because workspace edit rights bypass row-level security. Use separate dev, test and production workspaces and promote content with <strong>deployment pipelines</strong> and parameter rules, so nobody edits production directly.</p>
+      <p><strong>Model strategy:</strong> publish one shared semantic model and point multiple reports at it, instead of shipping a copy of the model inside every PBIX. This is the main defence against several dashboards disagreeing about the same number.</p>
+      <p><strong>Refresh:</strong> set a scheduled refresh, install an on-premises data gateway for any source behind the firewall, store the credentials on the dataset, and enable failure notifications so a broken refresh does not silently serve stale data. Add incremental refresh once volumes justify it.</p>
+      <p><strong>Licensing:</strong> Pro for authors and consumers, Premium Per User for individuals who need premium features, or Premium/Fabric capacity when you need free users to view content at scale.</p>
+      <p><strong>Governance:</strong> row-level security tested with View as role, deliberate workspace roles, dataset endorsement or certification so people find the trusted model, documented definitions and refresh schedules, and the PBIX kept in source control.</p>`
     },
     {
       id: 'pbi-h5',
