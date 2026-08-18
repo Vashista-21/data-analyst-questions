@@ -6,7 +6,7 @@ Live site: `https://vashista-21.github.io/data-analyst-questions/`
 
 ## What is in it
 
-Eight topics, 15 questions each (5 easy, 5 medium, 5 hard) — 120 questions in total.
+Nine topics, 15 questions each (5 easy, 5 medium, 5 hard) — 135 questions in total.
 
 | Topic | Focus |
 | --- | --- |
@@ -16,6 +16,7 @@ Eight topics, 15 questions each (5 easy, 5 medium, 5 hard) — 120 questions in 
 | Statistics & Probability | Distributions, CLT, confidence intervals, test selection, Bayes, sampling traps |
 | Python & Pandas | Selection, joins, groupby, time series, sessionisation, performance |
 | Product Metrics & Cases | Metric definition, funnels, retention, diagnosing drops, structured cases |
+| Metric Drops & Root Cause | Second-round case rounds: data validation, segmentation, contribution analysis, mix shifts, dashboard mismatches, impact sizing, incident communication |
 | Tableau | Pills and filters, joins vs blending vs relationships, LOD expressions, table calcs, performance |
 | Power BI | Power Query vs DAX, filter context and CALCULATE, star schemas, time intelligence, RLS, model size |
 
