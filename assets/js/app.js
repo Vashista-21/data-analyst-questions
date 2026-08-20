@@ -183,33 +183,48 @@
     const difficulty = selectedDifficulty();
     grid.innerHTML = '';
 
-    DAQ.topics.forEach((topic) => {
-      const stats = topicStats(topic);
-      const setSize = DAQ.questionsFor(topic.id, difficulty).length;
+    DAQ.groups.forEach((group) => {
+      const topics = DAQ.topicsInGroup(group.id);
+      if (!topics.length) return;
 
-      const card = document.createElement('button');
-      card.className = 'topic-card';
-      card.innerHTML =
-        '<div class="topic-card-top">' +
-          '<span class="topic-icon">' + topic.icon + '</span>' +
-          '<span class="topic-name">' + topic.name + '</span>' +
-        '</div>' +
-        '<p class="topic-blurb">' + topic.blurb + '</p>' +
-        '<div class="topic-tags">' +
-          '<span class="pill pill-easy">5 easy</span>' +
-          '<span class="pill pill-medium">5 medium</span>' +
-          '<span class="pill pill-hard">5 hard</span>' +
-        '</div>' +
-        '<div class="topic-bar"><div class="topic-fill" style="width:' + (stats.total ? (stats.correct / stats.total) * 100 : 0) + '%"></div></div>' +
-        '<div class="topic-foot">' +
-          '<span>' + stats.correct + ' of ' + stats.total + ' solved</span>' +
-          '<span>Start ' + setSize + ' question' + (setSize === 1 ? '' : 's') + ' \u2192</span>' +
-        '</div>';
-      card.addEventListener('click', () => startSession(topic.id, difficulty));
-      grid.appendChild(card);
+      const head = document.createElement('div');
+      head.className = 'topic-group-head';
+      head.innerHTML =
+        '<h3 class="topic-group-title">' + group.label + '</h3>' +
+        (group.note ? '<p class="topic-group-note">' + group.note + '</p>' : '');
+      grid.appendChild(head);
+
+      topics.forEach((topic) => renderTopicCard(topic, difficulty, grid));
     });
 
     renderSummaryStats();
+  }
+
+  function renderTopicCard(topic, difficulty, grid) {
+    const stats = topicStats(topic);
+    const setSize = DAQ.questionsFor(topic.id, difficulty).length;
+    const counts = DAQ.countsFor(topic);
+
+    const card = document.createElement('button');
+    card.className = 'topic-card';
+    card.innerHTML =
+      '<div class="topic-card-top">' +
+        '<span class="topic-icon">' + topic.icon + '</span>' +
+        '<span class="topic-name">' + topic.name + '</span>' +
+      '</div>' +
+      '<p class="topic-blurb">' + topic.blurb + '</p>' +
+      '<div class="topic-tags">' +
+        '<span class="pill pill-easy">' + counts.easy + ' easy</span>' +
+        '<span class="pill pill-medium">' + counts.medium + ' medium</span>' +
+        '<span class="pill pill-hard">' + counts.hard + ' hard</span>' +
+      '</div>' +
+      '<div class="topic-bar"><div class="topic-fill" style="width:' + (stats.total ? (stats.correct / stats.total) * 100 : 0) + '%"></div></div>' +
+      '<div class="topic-foot">' +
+        '<span>' + stats.correct + ' of ' + stats.total + ' solved</span>' +
+        '<span>Start ' + setSize + ' question' + (setSize === 1 ? '' : 's') + ' \u2192</span>' +
+      '</div>';
+    card.addEventListener('click', () => startSession(topic.id, difficulty));
+    grid.appendChild(card);
   }
 
   function renderSummaryStats() {

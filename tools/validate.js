@@ -85,9 +85,15 @@ DAQ.topics.forEach((topic) => {
     if (DAQ.evaluator.evaluate(q, 'i do not know').verdict === 'correct') errors.push(`${where}: junk answer graded correct`);
   });
 
+  /* Topics may be larger than the original 15, but every tier must carry
+     enough questions to make a difficulty-filtered set worth starting. */
   ['easy', 'medium', 'hard'].forEach((d) => {
-    if (counts[d] !== 5) errors.push(`topic ${topic.id}: expected 5 ${d}, found ${counts[d]}`);
+    if (counts[d] < 5) errors.push(`topic ${topic.id}: expected at least 5 ${d}, found ${counts[d]}`);
   });
+
+  if (!DAQ.groups.some((g) => g.id === topic.group)) {
+    errors.push(`topic ${topic.id}: group "${topic.group}" is not a known dashboard group`);
+  }
 });
 
 const total = DAQ.topics.reduce((n, t) => n + t.questions.length, 0);

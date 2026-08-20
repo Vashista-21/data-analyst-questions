@@ -6,19 +6,33 @@ Live site: `https://vashista-21.github.io/data-analyst-questions/`
 
 ## What is in it
 
-Nine topics, 15 questions each (5 easy, 5 medium, 5 hard) — 135 questions in total.
+Eleven topics, 180 questions, grouped on the dashboard by how directly they matter for a Navi interview. Every topic has at least 5 easy, 5 medium and 5 hard questions.
+
+**Navi interview questions**
 
 | Topic | Focus |
 | --- | --- |
-| SQL | Filtering, joins, aggregation, window functions, cohort and funnel queries |
-| A/B Testing | Hypotheses, power, sample size, peeking, SRM, interference, ship decisions |
-| Guesstimates | Market sizing and back-of-the-envelope estimation with sanity checks |
-| Statistics & Probability | Distributions, CLT, confidence intervals, test selection, Bayes, sampling traps |
-| Python & Pandas | Selection, joins, groupby, time series, sessionisation, performance |
-| Product Metrics & Cases | Metric definition, funnels, retention, diagnosing drops, structured cases |
-| Metric Drops & Root Cause | Second-round case rounds: data validation, segmentation, contribution analysis, mix shifts, dashboard mismatches, impact sizing, incident communication |
-| Tableau | Pills and filters, joins vs blending vs relationships, LOD expressions, table calcs, performance |
-| Power BI | Power Query vs DAX, filter context and CALCULATE, star schemas, time intelligence, RLS, model size |
+| Navi Interview Questions (15) | Reported from real Navi rounds: live SQL on transactions and loan books, UPI and lending cases, dashboard design, credit risk judgement, guesstimates |
+
+**Concepts and questions to prepare for Navi interview**
+
+| Topic | Focus |
+| --- | --- |
+| SQL (15) | Filtering, joins, aggregation, window functions, cohort and funnel queries |
+| Product Metrics, Cases & RCA (30) | Metric definition, funnels, retention, north stars, plus the root cause toolkit: validating a drop, segmentation, contribution analysis, mix shifts, dashboard mismatches, impact sizing, incident communication |
+| Data Design & Modelling (15) | OLTP vs OLAP, facts and dimensions, grain, star schemas, surrogate keys, slowly changing dimensions, event schemas, point-in-time correctness, data quality by design |
+| Data Partitioning (15) | Pruning, partition key and granularity, range vs hash, small files, clustering, skew, incremental loads and partition overwrite, repartitioning at scale |
+
+**Rest of the topics**
+
+| Topic | Focus |
+| --- | --- |
+| A/B Testing (15) | Hypotheses, power, sample size, peeking, SRM, interference, ship decisions |
+| Guesstimates (15) | Market sizing and back-of-the-envelope estimation with sanity checks |
+| Statistics & Probability (15) | Distributions, CLT, confidence intervals, test selection, Bayes, sampling traps |
+| Python & Pandas (15) | Selection, joins, groupby, time series, sessionisation, performance |
+| Tableau (15) | Pills and filters, joins vs blending vs relationships, LOD expressions, table calcs, performance |
+| Power BI (15) | Power Query vs DAX, filter context and CALCULATE, star schemas, time intelligence, RLS, model size |
 
 Every question includes a grading rubric, a **model answer**, and a **how to approach it** explanation that is shown after you submit (whether you were right or wrong) and via the "See the answer" button.
 
@@ -81,11 +95,13 @@ Rules that keep grading sane:
 - Keep 4–8 concepts per question. Too few makes grading coarse, too many makes it noisy.
 - For guesstimates, set `numeric` so the final number is checked for being in the right ballpark.
 
-To add a whole new topic, copy a file in `assets/js/data/`, change the `id`/`name`/`icon`/`blurb`, and add a `<script>` tag for it in `index.html`.
+To add a whole new topic, copy a file in `assets/js/data/`, change the `id`/`name`/`icon`/`blurb`, set `group` to one of the dashboard groups declared in `assets/js/bank.js` (`navi`, `prep`, `rest`), and add a `<script>` tag for it in `index.html`. Script order decides the order topics appear within their group.
+
+Two files may register the same topic `id`, in which case their questions are merged into one card — that is how `product-metrics.js` and `case-studies.js` form the combined Product Metrics, Cases & RCA bank.
 
 ## Validating changes
 
-A structural check runs the banks in Node, verifies each topic has 5 easy / 5 medium / 5 hard, that ids are unique, that rubrics are usable, and that every model answer grades as correct against its own rubric:
+A structural check runs the banks in Node, verifies each topic has at least 5 easy / 5 medium / 5 hard and belongs to a known dashboard group, that ids are unique, that rubrics are usable, and that every model answer grades as correct against its own rubric:
 
 ```bash
 node tools/validate.js

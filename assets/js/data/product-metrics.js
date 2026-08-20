@@ -1,8 +1,12 @@
+/* Part 1 of the "Product Metrics, Cases & RCA" bank: metric definition and
+   product case questions. Part 2 lives in case-studies.js and registers the
+   same topic id, so the two files render as one topic. */
 DAQ.registerTopic({
-  id: 'product-metrics',
-  name: 'Product Metrics & Cases',
+  id: 'product-cases',
+  group: 'prep',
+  name: 'Product Metrics, Cases & RCA',
   icon: '\uD83D\uDCCA',
-  blurb: 'Metric definition, funnels, retention, diagnosing sudden drops and structured product case answers.',
+  blurb: 'Metric definition, funnels, retention and north stars, plus the full root cause toolkit: validating a drop, segmentation, contribution analysis, mix shifts, dashboard mismatches, impact sizing and the leadership update.',
   questions: [
     /* ---------------------------- EASY ---------------------------- */
     {
@@ -150,42 +154,6 @@ Overall                 : 12%</pre>
     },
 
     /* --------------------------- MEDIUM --------------------------- */
-    {
-      id: 'pm-m1',
-      difficulty: 'medium',
-      prompt: 'DAU dropped 15% overnight. Walk through how you would diagnose it in the first hour.',
-      hint: 'Rule out measurement first, then segment aggressively before theorising about users.',
-      concepts: [
-        { label: 'First verify the data: pipeline failure, logging change, duplicate or missing events', any: ['pipeline', 'logging', 'data issue', 'etl', 'tracking', 'instrument', 'is the data', 'measurement'], required: true },
-        { label: 'Check whether the metric definition or a dashboard filter changed', any: ['definition', 'filter', 'dashboard', 'query change', 'metric change', 'logic'], required: true },
-        { label: 'Segment by platform, app version, geography and channel to localise it', any: ['platform', 'app version', 'geograph', 'country', 'device', 'os', 'segment', 'channel'], required: true },
-        { label: 'Check internal causes: releases, deploys, experiments, config or pricing changes', any: ['release', 'deploy', 'experiment', 'config', 'rollout', 'change log', 'push', 'pricing'], required: true },
-        { label: 'Check external causes: outage, holiday, competitor, seasonality, news event', any: ['outage', 'holiday', 'competitor', 'seasonal', 'external', 'weather', 'festival', 'network'], required: true },
-        { label: 'Split new versus returning users to separate acquisition from engagement', any: ['new versus', 'new vs', 'returning', 'acquisition', 'existing user', 'new user'], required: true },
-        { label: 'Compare against the same weekday last week rather than yesterday', any: ['last week', 'same day', 'week over week', 'yoy', 'day of week', 'baseline'], required: true },
-        { label: 'Communicate early with what is known, unknown and next steps', any: ['communicat', 'stakeholder', 'update', 'inform', 'escalat', 'status'] }
-      ],
-      approach: `<p>Work outside-in: is the number real, is it localised, and only then why did users change behaviour. Most overnight 15% drops are measurement or release issues.</p>
-      <ol>
-        <li><strong>Is the drop real? (10 minutes)</strong> Check pipeline run status and freshness, event volumes at the raw layer, and whether any tracking or SDK change shipped. Confirm no dashboard filter, metric definition or query changed. A partial data load is the single most common cause.</li>
-        <li><strong>Compare against the right baseline.</strong> Use the same weekday last week and the same period last year, not yesterday, so weekly seasonality and holidays are not mistaken for incidents.</li>
-        <li><strong>Localise it. (20 minutes)</strong> Slice by platform, app version, OS, geography, acquisition channel and user tenure. A drop concentrated in one dimension is almost always technical: one app version pointing at a broken endpoint, one region behind a CDN failure, one channel whose campaigns were paused.</li>
-        <li><strong>Check what we did.</strong> Review deploys, feature-flag changes, experiment ramps, pricing or paywall changes, push and email campaigns and their timing. Correlate the exact hour of the drop with the change log.</li>
-        <li><strong>Check what happened to us.</strong> Infrastructure or third-party outages (auth providers, payment gateways), app store issues, holidays, major news or sports events, and competitor promotions.</li>
-        <li><strong>Split new versus returning.</strong> A fall in new users points to acquisition, marketing or the store listing; a fall in returning users points to product, notifications or a broken login. This single cut usually decides which team owns the investigation.</li>
-        <li><strong>Communicate.</strong> Within the hour, share what is confirmed, what is still unknown, the current leading hypothesis and the next check, with a time for the next update. Silence during an incident is worse than an incomplete answer.</li>
-      </ol>`,
-      answer: `<p><strong>Hour one, in order:</strong></p>
-      <ol>
-        <li><strong>Validate the data:</strong> pipeline/job status, raw event volumes, SDK or tracking releases, and any change to the metric definition or dashboard filters. Partial loads and logging changes cause most overnight cliffs.</li>
-        <li><strong>Use the right baseline:</strong> same weekday last week and same period last year, not yesterday.</li>
-        <li><strong>Localise by segment:</strong> platform, app version, OS, geography, channel, tenure. Concentration in one slice implies a technical root cause.</li>
-        <li><strong>Check internal changes:</strong> deploys, feature flags, experiment ramps, paywall or pricing changes, campaign schedules, matched to the hour of the drop.</li>
-        <li><strong>Check external causes:</strong> infrastructure or third-party outages, app store problems, holidays, major events, competitor activity.</li>
-        <li><strong>Split new versus returning users</strong> to separate an acquisition problem from an engagement or access problem.</li>
-      </ol>
-      <p>Then communicate a short status: confirmed facts, open questions, leading hypothesis, next check and next update time. If it is real and product-caused, quantify the affected population and recommend rollback rather than waiting for a complete root cause.</p>`
-    },
     {
       id: 'pm-m2',
       difficulty: 'medium',

@@ -1,5 +1,6 @@
 DAQ.registerTopic({
   id: 'ab-testing',
+  group: 'rest',
   name: 'A/B Testing',
   icon: '\uD83E\uDDEA',
   blurb: 'Hypotheses, p-values, power, sample size, peeking, sample ratio mismatch and shipping decisions.',

@@ -1,8 +1,8 @@
+/* Part 2 of the "Product Metrics, Cases & RCA" bank: metric-drop and root cause
+   questions. Part 1 lives in product-metrics.js and carries the topic metadata;
+   registering the same id here appends to it rather than adding a second card. */
 DAQ.registerTopic({
-  id: 'case-studies',
-  name: 'Metric Drops & Root Cause',
-  icon: '\uD83D\uDCC9',
-  blurb: 'Second-round case rounds: a metric moved and nobody knows why. Data validation, segmentation, contribution analysis, mix shifts, dashboard mismatches, impact sizing and the leadership update.',
+  id: 'product-cases',
   questions: [
     /* ---------------------------- EASY ---------------------------- */
     {
@@ -271,6 +271,35 @@ DAQ.registerTopic({
       answer: `<p>I would first check that attempt volume is normal and that both client and server logging show the drop, so I know the metric is real and the problem is inside payments rather than upstream. Then I would decompose the flow into steps, from intent created through the gateway request, authentication, bank authorisation and callback to the order being marked paid, and find which step is losing users, since each step implies a different owner.</p>
       <p>Next I would group failures by error and decline reason code and compare the distribution against the previous day. A spike concentrated in one code, whether a timeout, an invalid VPA or an issuer decline, usually identifies the broken layer immediately. Alongside that I would segment by gateway or PSP, issuing bank, payment method, app version, platform and geography. Concentration in one gateway or bank points to an external partner, while concentration in one app version points to a client-side release. I would pin the drop start time to the minute and align it with the deploy log, config and feature-flag changes, gateway status pages and the incident channel.</p>
       <p>I would rank candidate causes by affected volume times the drop within that segment so effort follows lost payments rather than curiosity. Within the hour I would recommend the most reversible action the evidence supports: roll back the release or flag if it maps to a deploy, reroute or failover to an alternate gateway if one provider is degraded, or escalate to the partner with the reason-code evidence if it is their side. In an incident, a justified rollback beats a perfect causal proof. Then I would verify recovery on the same chart, quantify the payments and revenue lost during the window, and add an alert on success rate by gateway so the next occurrence is caught in minutes.</p>`
+    },
+
+    {
+      id: 'cs-m6',
+      difficulty: 'medium',
+      prompt: 'A change to the credit policy lifts loan <strong>approval rate by 10%</strong> and the team wants to call it a win. Which guardrail metrics must you check first, and why is approval rate alone a dangerous target?',
+      hint: 'Any metric that measures how much you say yes can be gamed by saying yes to worse applicants.',
+      concepts: [
+        { label: 'Approval rate is an input metric that can be moved without creating value', any: ['input metric', 'not an outcome', 'can be gamed', 'easy to move', 'vanity', 'proxy'], required: true },
+        { label: 'Check downstream credit quality: default rate, delinquency, first payment default', any: ['default', 'delinquen', 'npa', 'credit quality', 'loss rate', 'fpd', 'risk'], required: true },
+        { label: 'Effects appear with a lag, so the cohort needs time to season', any: ['lag', 'season', 'matur', 'too early', 'time to', 'not yet visible', 'vintage'], required: true },
+        { label: 'Judge on unit economics: risk-adjusted margin, not volume', any: ['unit econom', 'margin', 'profit', 'risk adjusted', 'revenue per', 'contribution'], required: true },
+        { label: 'Check the funnel downstream of approval: disbursal and drop-off', any: ['disburs', 'downstream', 'funnel', 'accept', 'drop off', 'conversion'], required: true },
+        { label: 'Compare cohorts on a like-for-like basis, watching for mix shift in applicants', any: ['cohort', 'mix', 'like for like', 'segment', 'applicant quality', 'composition'] },
+        { label: 'Define the guardrail thresholds in advance and monitor them', any: ['guardrail', 'threshold', 'in advance', 'monitor', 'alert', 'pre declare'], required: true }
+      ],
+      approach: `<p>Any metric that counts how often you approve can be improved by approving people you should not. The answer is to name the guardrails that make the win real.</p>
+      <ol>
+        <li><strong>Say why the target is dangerous.</strong> Approval rate is an input, fully under our control, and moving it does not by itself create value. Loosening a cut-off raises it instantly, which is why it must never be optimised without a risk counterweight.</li>
+        <li><strong>Credit quality guardrails:</strong> first payment default, 30 and 90 day delinquency, and default rate by disbursal cohort. These are the metrics the policy change puts at risk.</li>
+        <li><strong>Respect the lag.</strong> Losses season over months, so a cohort approved last week cannot yet have a default rate. Comparing an immature cohort against a mature one makes any policy look good, which is the single most common error here. Compare cohorts at the same age, for example FPD at 30 days on book.</li>
+        <li><strong>Downstream funnel:</strong> approval means nothing if those users do not accept and draw down. Check approval to disbursal conversion, since a policy that approves more but at worse terms can raise approvals and lower disbursals.</li>
+        <li><strong>Judge on risk-adjusted economics:</strong> interest and fee revenue minus expected credit loss and acquisition cost, per approved applicant. That single number tells you whether the extra volume was worth it.</li>
+        <li><strong>Check the mix.</strong> If the applicant pool changed at the same time as the policy, the comparison is confounded, so recompute holding applicant segments constant.</li>
+        <li><strong>Pre-declare the guardrails and thresholds</strong> before the change ramps, with alerting, so the decision to roll back is made on data rather than on argument.</li>
+      </ol>`,
+      answer: `<p>Approval rate is an input metric that we control directly, so it can always be raised by lowering the bar. On its own it is close to a vanity target: the value only exists if the extra approvals repay. So before calling this a win I would check credit quality guardrails on the same cohorts, first payment default and 30 and 90 day delinquency by disbursal vintage, along with the downstream funnel from approval to disbursal, since more approvals at worse terms can produce fewer actual loans.</p>
+      <p>The critical subtlety is the lag. Credit losses season over months, so a cohort approved recently has almost no observed defaults yet, and comparing it against a mature cohort makes any loosening look brilliant. I would compare cohorts at equal age on book, using early risk indicators such as FPD as the leading signal, and I would say explicitly that the final read is not available yet.</p>
+      <p>The decision metric is risk-adjusted unit economics: revenue per approved applicant minus expected credit loss and acquisition cost, rather than approval volume. I would also check whether the applicant mix shifted at the same time, recomputing on a like-for-like segment basis so a change in who applied is not credited to the policy. Finally I would insist the guardrails and their thresholds are pre-declared with monitoring in place, so a rollback decision is triggered by data instead of debated after the fact.</p>`
     },
 
     /* ---------------------------- HARD ---------------------------- */

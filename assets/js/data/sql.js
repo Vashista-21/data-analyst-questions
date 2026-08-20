@@ -1,5 +1,6 @@
 DAQ.registerTopic({
   id: 'sql',
+  group: 'prep',
   name: 'SQL',
   icon: '\uD83D\uDDC4\uFE0F',
   blurb: 'Filtering, joins, aggregation, window functions and the classic analyst round-one queries.',

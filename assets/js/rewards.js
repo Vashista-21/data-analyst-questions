@@ -47,7 +47,7 @@ DAQ.rewards = (function () {
       id: 'topic-' + topic.id,
       emoji: topic.icon || '\uD83C\uDFC5',
       name: topic.name + ' Cleared',
-      desc: 'Answer all 15 ' + topic.name + ' questions correctly'
+      desc: 'Answer all ' + (topic.questions ? topic.questions.length : 0) + ' ' + topic.name + ' questions correctly'
     }));
     return BADGES.concat(dynamic);
   }

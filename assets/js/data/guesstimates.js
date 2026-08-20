@@ -1,5 +1,6 @@
 DAQ.registerTopic({
   id: 'guesstimates',
+  group: 'rest',
   name: 'Guesstimates',
   icon: '\uD83D\uDCD0',
   blurb: 'Market sizing and back-of-the-envelope estimation with stated assumptions and a sanity check.',

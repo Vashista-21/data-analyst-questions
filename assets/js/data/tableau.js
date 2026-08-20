@@ -1,5 +1,6 @@
 DAQ.registerTopic({
   id: 'tableau',
+  group: 'rest',
   name: 'Tableau',
   icon: '\uD83D\uDCC8',
   blurb: 'Pills and filters, joins versus blending, LOD expressions, table calculations and dashboard performance.',

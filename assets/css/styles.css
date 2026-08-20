@@ -200,6 +200,12 @@ kbd {
 .topic-foot { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
 .topic-tags { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
 
+/* Full-width band that splits the grid into named groups of topics. */
+.topic-group-head { grid-column: 1 / -1; margin: 10px 0 2px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.topic-group-head:first-child { margin-top: 0; }
+.topic-group-title { font-size: 1.02rem; font-weight: 800; letter-spacing: 0.01em; }
+.topic-group-note { color: var(--muted); font-size: 0.84rem; margin-top: 4px; }
+
 .pill {
   font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
   padding: 4px 9px; border-radius: 999px;

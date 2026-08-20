@@ -1,5 +1,6 @@
 DAQ.registerTopic({
   id: 'power-bi',
+  group: 'rest',
   name: 'Power BI',
   icon: '\uD83D\uDCCA',
   blurb: 'Power Query versus DAX, filter context and CALCULATE, star schemas, time intelligence, RLS and model performance.',
