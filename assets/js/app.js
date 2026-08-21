@@ -61,6 +61,14 @@
       if (event.target === el('badge-modal')) el('badge-modal').hidden = true;
     });
 
+    el('brief-close').addEventListener('click', () => { el('brief-modal').hidden = true; });
+    el('brief-modal').addEventListener('click', (event) => {
+      if (event.target === el('brief-modal')) el('brief-modal').hidden = true;
+    });
+    el('brief-btn').addEventListener('click', () => {
+      if (session) openBrief(DAQ.getTopic(session.topicId));
+    });
+
     el('reset-btn').addEventListener('click', resetProgress);
     el('export-btn').addEventListener('click', exportProgress);
     el('import-btn').addEventListener('click', () => el('import-file').click());
@@ -205,7 +213,7 @@
     const setSize = DAQ.questionsFor(topic.id, difficulty).length;
     const counts = DAQ.countsFor(topic);
 
-    const card = document.createElement('button');
+    const card = document.createElement('article');
     card.className = 'topic-card';
     card.innerHTML =
       '<div class="topic-card-top">' +
@@ -221,10 +229,30 @@
       '<div class="topic-bar"><div class="topic-fill" style="width:' + (stats.total ? (stats.correct / stats.total) * 100 : 0) + '%"></div></div>' +
       '<div class="topic-foot">' +
         '<span>' + stats.correct + ' of ' + stats.total + ' solved</span>' +
-        '<span>Start ' + setSize + ' question' + (setSize === 1 ? '' : 's') + ' \u2192</span>' +
+        '<span class="topic-actions">' +
+          (topic.brief ? '<button class="topic-brief-btn btn-link">Read the brief</button>' : '') +
+          '<button class="topic-cta btn-link">Start ' + setSize + ' question' + (setSize === 1 ? '' : 's') + ' \u2192</button>' +
+        '</span>' +
       '</div>';
+
+    /* The whole card is clickable, but the brief button must not start a session. */
     card.addEventListener('click', () => startSession(topic.id, difficulty));
+    const briefBtn = card.querySelector('.topic-brief-btn');
+    if (briefBtn) {
+      briefBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        openBrief(topic);
+      });
+    }
     grid.appendChild(card);
+  }
+
+  function openBrief(topic) {
+    if (!topic || !topic.brief) return;
+    el('brief-title').textContent = topic.name;
+    el('brief-body').innerHTML = topic.brief;
+    el('brief-body').scrollTop = 0;
+    el('brief-modal').hidden = false;
   }
 
   function renderSummaryStats() {
@@ -309,6 +337,7 @@
     el('feedback').hidden = true;
     el('hint-box').hidden = true;
     el('hint-btn').hidden = !question.hint;
+    el('brief-btn').hidden = !(DAQ.getTopic(session.topicId) || {}).brief;
     el('prev-btn').disabled = session.index === 0;
     el('next-btn').textContent = session.index === session.questions.length - 1 ? 'Finish \u2192' : 'Next \u2192';
 

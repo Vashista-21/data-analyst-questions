@@ -152,6 +152,7 @@
         <button id="submit-btn" class="btn btn-primary">Submit answer</button>
         <button id="reveal-btn" class="btn btn-outline">See the answer</button>
         <button id="hint-btn" class="btn btn-ghost">Hint</button>
+        <button id="brief-btn" class="btn btn-ghost" hidden>Brief</button>
         <div class="spacer"></div>
         <button id="prev-btn" class="btn btn-ghost">&larr; Prev</button>
         <button id="next-btn" class="btn btn-outline">Next &rarr;</button>
@@ -224,6 +225,17 @@
   </div>
 </div>
 
+<!-- ============ TOPIC BRIEF MODAL ============ -->
+<div id="brief-modal" class="modal" hidden>
+  <div class="modal-card modal-card-wide">
+    <div class="modal-head">
+      <h3 id="brief-title">Brief</h3>
+      <button id="brief-close" class="btn btn-ghost btn-sm">Close</button>
+    </div>
+    <div id="brief-body" class="brief prose"></div>
+  </div>
+</div>
+
 <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
 
 <script src="assets/js/storage.js"></script>
@@ -233,6 +245,7 @@
 <!-- Load order sets the order topics appear within their dashboard group.
      product-metrics.js and case-studies.js register one merged topic. -->
 <script src="assets/js/data/navi.js"></script>
+<script src="assets/js/data/navi-culture.js"></script>
 <script src="assets/js/data/sql.js"></script>
 <script src="assets/js/data/product-metrics.js"></script>
 <script src="assets/js/data/case-studies.js"></script>

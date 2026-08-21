@@ -6,13 +6,14 @@ Live site: `https://vashista-21.github.io/data-analyst-questions/`
 
 ## What is in it
 
-Eleven topics, 180 questions, grouped on the dashboard by how directly they matter for a Navi interview. Every topic has at least 5 easy, 5 medium and 5 hard questions.
+Twelve topics, 195 questions, grouped on the dashboard by how directly they matter for a Navi interview. Every topic has at least 5 easy, 5 medium and 5 hard questions.
 
 **Navi interview questions**
 
 | Topic | Focus |
 | --- | --- |
 | Navi Interview Questions (15) | Reported from real Navi rounds: live SQL on transactions and loan books, UPI and lending cases, dashboard design, credit risk judgement, guesstimates |
+| Navi Cultural Fit (15) | The values round: what Navi is and sells, the six Navi OS principles, why you want to join, and behavioural answers on ownership, urgency, detail, integrity and prioritisation. Includes a **brief** to read first |
 
 **Concepts and questions to prepare for Navi interview**
 
@@ -96,6 +97,8 @@ Rules that keep grading sane:
 - For guesstimates, set `numeric` so the final number is checked for being in the right ballpark.
 
 To add a whole new topic, copy a file in `assets/js/data/`, change the `id`/`name`/`icon`/`blurb`, set `group` to one of the dashboard groups declared in `assets/js/bank.js` (`navi`, `prep`, `rest`), and add a `<script>` tag for it in `index.html`. Script order decides the order topics appear within their group.
+
+A topic may also carry an optional `brief`, a block of HTML shown from the "Read the brief" link on its card and from the **Brief** button while answering. It is meant for reference material you should read before the questions, such as the company and values summary on Navi Cultural Fit.
 
 Two files may register the same topic `id`, in which case their questions are merged into one card — that is how `product-metrics.js` and `case-studies.js` form the combined Product Metrics, Cases & RCA bank.
 
