@@ -1,6 +1,6 @@
 DAQ.registerTopic({
   id: 'python-pandas',
-  group: 'rest',
+  group: 'prep',
   name: 'Python & Pandas',
   icon: '\uD83D\uDC0D',
   blurb: 'Selection, joins, groupby, time series and the pandas traps that come up in take-home rounds.',

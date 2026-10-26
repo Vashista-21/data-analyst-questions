@@ -3,7 +3,7 @@
    pruning, partition key choice, skew, incremental loads and repartitioning. */
 DAQ.registerTopic({
   id: 'data-partitioning',
-  group: 'prep',
+  group: 'rest',
   name: 'Data Partitioning',
   icon: '\uD83E\uDDE9',
   blurb: 'Partitioning for scale: pruning, choosing a partition key and granularity, range versus hash, small files, clustering, skew, incremental loads and partition overwrite, plus repartitioning a huge table safely.',

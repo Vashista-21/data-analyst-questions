@@ -8,28 +8,36 @@ window.DAQ = window.DAQ || {};
 DAQ.topics = [];
 
 /* Dashboard groups, rendered in this order. A topic declares which group it
-   belongs to with `group: '<id>'`; anything unassigned falls into the last one. */
+   belongs to with `group: '<id>'`; anything unassigned falls into FALLBACK_GROUP.
+   The current target company sits on top; earlier company prep sits last. */
 DAQ.groups = [
   {
-    id: 'navi',
-    label: 'Navi interview questions',
-    note: 'Questions reported from real Navi interview rounds, with worked solutions.'
+    id: 'khatabook',
+    label: 'Khatabook data analyst prep',
+    note: 'Start here. Questions reported from Khatabook analyst rounds with worked solutions, and the culture round with a company brief.'
   },
   {
     id: 'prep',
-    label: 'Concepts and questions to prepare for Navi interview',
-    note: 'The areas Navi leans on hardest: SQL, metric cases and root cause, data design and partitioning.'
+    label: 'Concepts and questions to prepare for Khatabook interview',
+    note: 'What the Khatabook Central Analytics loop leans on: SQL and query optimisation, merchant metric cases and root cause, pipelines and fact tables, experiments and statistics.'
   },
   {
     id: 'rest',
     label: 'Rest of the topics',
     note: 'General analyst interview ground worth keeping sharp.'
+  },
+  {
+    id: 'navi',
+    label: 'Other company prep: Navi',
+    note: 'Navi interview questions and cultural fit from the earlier prep round, kept for reference.'
   }
 ];
 
+const FALLBACK_GROUP = 'rest';
+
 DAQ.groupFor = function (topic) {
   const known = DAQ.groups.some(function (group) { return group.id === topic.group; });
-  return known ? topic.group : DAQ.groups[DAQ.groups.length - 1].id;
+  return known ? topic.group : FALLBACK_GROUP;
 };
 
 DAQ.topicsInGroup = function (groupId) {

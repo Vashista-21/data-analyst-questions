@@ -6,34 +6,44 @@ Live site: `https://vashista-21.github.io/data-analyst-questions/`
 
 ## What is in it
 
-Twelve topics, 195 questions, grouped on the dashboard by how directly they matter for a Navi interview. Every topic has at least 5 easy, 5 medium and 5 hard questions.
+Fifteen topics, 240 questions, grouped on the dashboard around the current target, a Khatabook data analyst interview. Earlier company-specific prep (Navi) sits at the bottom. Every topic has at least 5 easy, 5 medium and 5 hard questions.
 
-**Navi interview questions**
+**Khatabook data analyst prep**
+
+| Topic | Focus |
+| --- | --- |
+| Khatabook Interview Questions (15) | Reported from Khatabook analyst rounds: SQL on ledger and payment tables, kirana engagement, north star, churn, Tier-1 vs Tier-2 adoption, onboarding A/B tests, offline-sync metric drops, merchant lending from ledger data, reminder causality, a guesstimate |
+| Khatabook Cultural Fit & Business Round (15) | What Khatabook is and sells, how it makes money, why you want to join, merchant empathy, stakeholder KPI conflicts, prioritisation, integrity with lending partners, first 90 days. Includes a **brief** to read first |
+
+**Concepts and questions to prepare for Khatabook interview**
+
+| Topic | Focus |
+| --- | --- |
+| SQL (15) | Filtering, joins, aggregation, window functions, cohort and funnel queries |
+| Product Metrics, Cases & RCA (30) | Metric definition, funnels, retention, north stars, plus the root cause toolkit: validating a drop, segmentation, contribution analysis, mix shifts, dashboard mismatches, impact sizing, incident communication |
+| ETL/ELT Pipelines, dbt & Airflow (15) | ETL vs ELT, dbt models, layers, tests and incremental builds, Airflow DAGs, idempotent backfills, CDC ingestion, reconciliation with finance, failure runbooks, automating manual reports, schema contracts |
+| Data Design & Modelling (15) | OLTP vs OLAP, facts and dimensions, grain, star schemas, surrogate keys, slowly changing dimensions, event schemas, point-in-time correctness, data quality by design |
+| A/B Testing (15) | Hypotheses, power, sample size, peeking, SRM, interference, ship decisions |
+| Statistics & Probability (15) | Distributions, CLT, confidence intervals, test selection, Bayes, sampling traps |
+| Python & Pandas (15) | Selection, joins, groupby, time series, sessionisation, performance |
+
+**Rest of the topics**
+
+| Topic | Focus |
+| --- | --- |
+| Guesstimates (15) | Market sizing and back-of-the-envelope estimation with sanity checks |
+| Data Partitioning (15) | Pruning, partition key and granularity, range vs hash, small files, clustering, skew, incremental loads and partition overwrite, repartitioning at scale |
+| Tableau (15) | Pills and filters, joins vs blending vs relationships, LOD expressions, table calcs, performance |
+| Power BI (15) | Power Query vs DAX, filter context and CALCULATE, star schemas, time intelligence, RLS, model size |
+
+**Other company prep: Navi**
 
 | Topic | Focus |
 | --- | --- |
 | Navi Interview Questions (15) | Reported from real Navi rounds: live SQL on transactions and loan books, UPI and lending cases, dashboard design, credit risk judgement, guesstimates |
 | Navi Cultural Fit (15) | The values round: what Navi is and sells, the six Navi OS principles, why you want to join, and behavioural answers on ownership, urgency, detail, integrity and prioritisation. Includes a **brief** to read first |
 
-**Concepts and questions to prepare for Navi interview**
-
-| Topic | Focus |
-| --- | --- |
-| SQL (15) | Filtering, joins, aggregation, window functions, cohort and funnel queries |
-| Product Metrics, Cases & RCA (30) | Metric definition, funnels, retention, north stars, plus the root cause toolkit: validating a drop, segmentation, contribution analysis, mix shifts, dashboard mismatches, impact sizing, incident communication |
-| Data Design & Modelling (15) | OLTP vs OLAP, facts and dimensions, grain, star schemas, surrogate keys, slowly changing dimensions, event schemas, point-in-time correctness, data quality by design |
-| Data Partitioning (15) | Pruning, partition key and granularity, range vs hash, small files, clustering, skew, incremental loads and partition overwrite, repartitioning at scale |
-
-**Rest of the topics**
-
-| Topic | Focus |
-| --- | --- |
-| A/B Testing (15) | Hypotheses, power, sample size, peeking, SRM, interference, ship decisions |
-| Guesstimates (15) | Market sizing and back-of-the-envelope estimation with sanity checks |
-| Statistics & Probability (15) | Distributions, CLT, confidence intervals, test selection, Bayes, sampling traps |
-| Python & Pandas (15) | Selection, joins, groupby, time series, sessionisation, performance |
-| Tableau (15) | Pills and filters, joins vs blending vs relationships, LOD expressions, table calcs, performance |
-| Power BI (15) | Power Query vs DAX, filter context and CALCULATE, star schemas, time intelligence, RLS, model size |
+Long-form concept notes to read alongside the questions live in `notes/` (`khatabook-prep-concepts.html`, plus the earlier Navi notes).
 
 Every question includes a grading rubric, a **model answer**, and a **how to approach it** explanation that is shown after you submit (whether you were right or wrong) and via the "See the answer" button.
 
@@ -96,9 +106,9 @@ Rules that keep grading sane:
 - Keep 4–8 concepts per question. Too few makes grading coarse, too many makes it noisy.
 - For guesstimates, set `numeric` so the final number is checked for being in the right ballpark.
 
-To add a whole new topic, copy a file in `assets/js/data/`, change the `id`/`name`/`icon`/`blurb`, set `group` to one of the dashboard groups declared in `assets/js/bank.js` (`navi`, `prep`, `rest`), and add a `<script>` tag for it in `index.html`. Script order decides the order topics appear within their group.
+To add a whole new topic, copy a file in `assets/js/data/`, change the `id`/`name`/`icon`/`blurb`, set `group` to one of the dashboard groups declared in `assets/js/bank.js` (`khatabook`, `prep`, `rest`, `navi`), and add a `<script>` tag for it in `index.html`. Group order on the dashboard follows `DAQ.groups`; script order decides the order topics appear within their group. A topic with an unknown group lands in `rest`.
 
-A topic may also carry an optional `brief`, a block of HTML shown from the "Read the brief" link on its card and from the **Brief** button while answering. It is meant for reference material you should read before the questions, such as the company and values summary on Navi Cultural Fit.
+A topic may also carry an optional `brief`, a block of HTML shown from the "Read the brief" link on its card and from the **Brief** button while answering. It is meant for reference material you should read before the questions, such as the company summaries on Khatabook Cultural Fit and Navi Cultural Fit.
 
 Two files may register the same topic `id`, in which case their questions are merged into one card — that is how `product-metrics.js` and `case-studies.js` form the combined Product Metrics, Cases & RCA bank.
 

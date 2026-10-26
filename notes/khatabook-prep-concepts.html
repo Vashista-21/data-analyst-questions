@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Khatabook Data Analyst — Concept Notes</title>
+<style>
+  body { max-width: 840px; margin: 40px auto; padding: 0 20px; font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color: #111; line-height: 1.55; font-size: 16px; }
+  h1 { font-size: 29px; margin-top: 8px; }
+  h2 { font-size: 23px; margin-top: 40px; border-bottom: 2px solid #ddd; padding-bottom: 6px; }
+  h3 { font-size: 18px; margin-top: 26px; }
+  h4 { font-size: 16px; margin-top: 18px; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; }
+  pre { background: #f5f5f5; padding: 12px 14px; overflow-x: auto; border-left: 3px solid #bbb; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; }
+  th, td { border: 1px solid #ccc; padding: 7px 10px; text-align: left; vertical-align: top; font-size: 15px; }
+  th { background: #f0f0f0; }
+  blockquote { margin: 14px 0; padding: 10px 14px; background: #f7f7f7; border-left: 3px solid #666; }
+  ul, ol { padding-left: 24px; }
+  li { margin: 5px 0; }
+  .lead { font-size: 17px; color: #333; }
+</style>
+</head>
+<body>
+
+<h1>Khatabook Data Analyst — Concept Notes</h1>
+<p class="lead">The concepts Khatabook's analyst loop actually tests, with the depth needed to answer them. Read a part, then attempt the matching topic on the prep site. Bold lines are the sentences worth saying out loud.</p>
+
+<h2>0. The loop and how to use these notes</h2>
+<table>
+<tr><th>Round</th><th>What is tested</th><th>Read</th><th>Practise on the site</th></tr>
+<tr><td>Screening (knockout)</td><td>SQL + a short business case</td><td>Parts 1, 3</td><td>Khatabook Interview Questions, SQL</td></tr>
+<tr><td>Technical 2</td><td>Window functions, CTEs, optimisation, statistics, mini case</td><td>Parts 3, 5</td><td>SQL, Statistics, A/B Testing</td></tr>
+<tr><td>Analytics case</td><td>Engagement, churn, metric drops, north star, lending</td><td>Parts 2, 6</td><td>Product Metrics, Cases &amp; RCA</td></tr>
+<tr><td>Business head</td><td>Prioritisation, stakeholders, business sense</td><td>Parts 1, 7</td><td>Khatabook Cultural Fit &amp; Business Round</td></tr>
+<tr><td>Culture fit</td><td>Ownership, resilience, merchant empathy, integrity</td><td>Part 7</td><td>Khatabook Cultural Fit &amp; Business Round</td></tr>
+</table>
+<p>The Data Analyst (Central Analytics) job post adds: <strong>strong SQL and query optimisation, ETL/ELT tools (dbt, Airflow, Airbyte), BI tools, fact tables, reporting automation, reconciling financial data with Finance</strong>. That is Part 4 and the ETL/ELT topic on the site. Some roles use an online SQL test or a take-home dataset instead of the first round.</p>
+
+<h1>PART 1 — KHATABOOK IN ONE PAGE</h1>
+
+<h2>1. What it is</h2>
+<ul>
+<li><strong>What</strong>: Bengaluru fintech building digital tools for India's small merchants: kiranas, wholesalers, small traders. India has about <strong>6.3 crore MSMEs</strong>.</li>
+<li><strong>Started</strong> January 2019 (incorporated 2018). Co-founders: <strong>Ravish Naresh</strong> (CEO, earlier a Housing.com co-founder), Jaideep Poonia, Dhanesh Kumar, Ashish Sonone, Vaibhav Kalpe.</li>
+<li><strong>Origin</strong>: digitising the <em>bahi khata</em>, the red notebook where shopkeepers track <strong>udhaar</strong> (credit given to customers) and <strong>jama</strong> (payments received).</li>
+<li><strong>Scale</strong>: 5 crore+ downloads, around 8 million+ monthly active merchants, 10+ languages. Backed by Sequoia India (Peak XV), Tribe Capital, B Capital and others; raised about $100M in 2021.</li>
+<li><strong>Mission line</strong>: "Simplify business, empower merchants" and "every business has the right to be digital".</li>
+</ul>
+
+<h2>2. Products</h2>
+<table>
+<tr><th>Product</th><th>What it does</th><th>Why an analyst cares</th></tr>
+<tr><td>Khatabook app (free)</td><td>Ledger, SMS/WhatsApp payment reminders, Khatabook QR and payment links, GST billing, inventory, reports. Works offline.</td><td>Engagement engine; source of behavioural data; offline sync complicates every metric</td></tr>
+<tr><td>Merchant lending</td><td>₹10K–₹5L collateral-free working-capital loans, 3–24 months, via RBI-registered NBFC partners; EDI (easy daily instalment) option</td><td>The main monetisation bet; funnel, risk and collections analytics</td></tr>
+<tr><td>Biz Analyst</td><td>Acquired 2021 (~$10M). Paid app on top of Tally for distributors and traders</td><td>SaaS subscription revenue, renewal and churn</td></tr>
+<tr><td>Pagarkhata</td><td>Staff attendance and salary</td><td>Cross-sell</td></tr>
+</table>
+<p>Khatabook shut down its MyStore e-commerce product in 2021 to focus. Good to mention: it shows you understand the strategy.</p>
+
+<h2>3. How it makes money</h2>
+<ul>
+<li><strong>Bookkeeping is free</strong> — the habit that brings merchants back weekly. It is the acquisition and data engine, not the revenue line.</li>
+<li><strong>Financial services</strong> — lending through NBFC partners. Khatabook acts as the lending service provider: sourcing, underwriting signals, servicing, collections. The ledger and collections history is what makes a kirana with no formal financials assessable.</li>
+<li><strong>SaaS</strong> — Biz Analyst and premium tools for larger merchants.</li>
+<li><strong>Financial picture</strong>: media reported FY24 revenue from operations ~₹103 crore, net loss ~₹116 crore (narrowing). Several layoff rounds in 2022–23 were explicitly about profitability. Expect a lean, cost-aware team. Check the latest numbers before the interview; never quote a figure you are unsure of.</li>
+</ul>
+<p><strong>"The free ledger is a data asset: it describes how an informal business actually runs, which is exactly what a lender lacks. But entries are self-reported, so verified collections through QR count for more than typed entries."</strong></p>
+
+<h2>4. The metric vocabulary</h2>
+<table>
+<tr><th>Area</th><th>Metrics</th></tr>
+<tr><td>Ledger engagement</td><td>Weekly active merchants (≥1 entry), active days/week, entries per active day, customers managed, D1/D7 activation (first entry), cohort retention</td></tr>
+<tr><td>Collections</td><td>Reminders sent, reminder → payment conversion, share of outstanding recovered in 7/14 days, days to collect, outstanding udhaar</td></tr>
+<tr><td>Payments</td><td>QR activation, first payment within first week, payment success rate, collected value (TPV), transacting merchants</td></tr>
+<tr><td>Lending funnel</td><td>Eligible → offer viewed → applied → KYC → approved → disbursed; approval rate, disbursal conversion, average ticket size, TAT</td></tr>
+<tr><td>Lending risk</td><td>EDI/EMI bounce rate, collection efficiency (collected ÷ due), DPD buckets (1–30, 31–60, 61–90, 90+), FPD, vintage curves at equal months on book, roll rates</td></tr>
+<tr><td>SaaS</td><td>Paid subscribers, trial → paid conversion, renewal rate, churn, ARPU</td></tr>
+</table>
+
+<h1>PART 2 — MERCHANT PRODUCT ANALYTICS</h1>
+
+<h2>1. Defining engagement for a kirana</h2>
+<ol>
+<li><strong>Core action, not app opens.</strong> Value happens when an entry is recorded and later collected.</li>
+<li><strong>Weekly cadence.</strong> Shops log credit customers a few times a week; daily is noisy, monthly too forgiving.</li>
+<li><strong>Depth</strong>: active days, entries per active day, customers managed.</li>
+<li><strong>Outcomes</strong>: reminders sent, money collected via QR/payment links.</li>
+<li><strong>Segment</strong>: business type, city tier, tenure, language.</li>
+<li><strong>Validate</strong>: merchants above the threshold must retain better at 60/90 days.</li>
+</ol>
+
+<h2>2. North star</h2>
+<p><strong>Weekly active merchants recording entries</strong> (threshold chosen by what best predicts 90-day retention). It captures value delivered, leads to revenue (lending eligibility and subscriptions need an engaged base), and is hard to inflate.</p>
+<p>Reject: downloads/registered users (vanity), DAU of app opens (activity without value), total amount recorded (a few wholesalers dominate; one typo moves it). Pair with input metrics (activation, reminders, QR collections) and counter-metrics (uninstalls, complaints).</p>
+
+<h2>3. Churn</h2>
+<ul>
+<li><strong>Define it</strong> for the cadence: e.g. no entry in 30 days. Separate dormancy and seasonal businesses (crackers, uniforms, harvest-linked shops).</li>
+<li><strong>Early churn vs late churn</strong>: never activated = onboarding problem; used for months then stopped = value or competition problem. Different owners, different fixes.</li>
+<li><strong>Cohort curves</strong> by signup month; segment by business type, tier, channel, language; rank by absolute churned merchants.</li>
+<li><strong>Behaviour before churn</strong> → early-warning signals (declining active days, never sent a reminder, no collections).</li>
+<li><strong>Why</strong>: exit surveys, calls, uninstall feedback. <strong>Act</strong>: interventions tested against a holdout.</li>
+<li><strong>False churn</strong>: reinstalls, new devices, late offline sync.</li>
+</ul>
+
+<h2>4. The offline-sync problem (Khatabook-specific, use it)</h2>
+<p>Merchants record entries without internet; the phone syncs later. So every entry has <strong>device time</strong> (created_at, when it happened, but the phone clock can be wrong) and <strong>server time</strong> (synced_at, when it arrived).</p>
+<ul>
+<li>Report by <strong>event date</strong>, but treat recent days as <strong>provisional</strong>; rebuild a lookback window nightly sized from the sync-lag distribution.</li>
+<li>Incremental pipelines must filter on <strong>synced_at</strong>, never created_at, or late entries are skipped forever.</li>
+<li>A "drop this morning" is very often just devices that have not synced yet. Compare same weekday, same hour, by event vs sync time.</li>
+</ul>
+<p><strong>"In an offline-first app, today is always incomplete for a while, so I separate when an entry happened from when it reached us."</strong></p>
+
+<h2>5. Adoption gap: Tier-1 vs Tier-2/3</h2>
+<p>Cheap to expensive: <strong>measurement</strong> (same denominator? events on old versions?) → <strong>rollout</strong> (feature flag, app version) → <strong>funnel</strong> (aware → tried → repeated) → <strong>context</strong> (vernacular language, literacy, low-end Android, storage, network) → <strong>business mix</strong> (compare within business type) → <strong>talk to merchants</strong> (field visits, support tickets) → <strong>pilot</strong> the fix.</p>
+
+<h2>6. Metric-drop checklist</h2>
+<ol>
+<li>Is it real? Pipeline complete, freshness, sync lag, right baseline (same weekday/hour).</li>
+<li>What changed? Release, app version, Android update, OTP/SMS provider, Play Store, regional outage, festival/holiday/bandh.</li>
+<li>Where? Segment by state, language, version, device, channel; rank by contribution.</li>
+<li>Communicate: confirmed, ruled out, next update time.</li>
+<li>Prevent: alerts on freshness and sync lag; provisional labels; restatement policy.</li>
+</ol>
+
+<h2>7. Leading vs lagging</h2>
+<p>Lagging = outcome after the fact (monthly collected value, TPV, churn). Leading = moves earlier and predicts it (QR activation and first payment in week one, success rate). A leading indicator must be <strong>validated</strong> against the outcome and <strong>paired</strong> with it so it is not gamed.</p>
+
+<h1>PART 3 — SQL PATTERNS KHATABOOK ASKS</h1>
+<p>Think aloud: which table, which filter, what grain, what to compute. Interviewers care more about decomposition than syntax. Examples use Trino syntax.</p>
+
+<h2>1. Active one week, silent the next</h2>
+<pre>WITH merchant_weeks AS (
+  SELECT DISTINCT merchant_id, DATE_TRUNC('week', created_at) AS wk
+  FROM ledger_entries
+  WHERE is_deleted = FALSE
+    AND created_at &lt; DATE_TRUNC('week', CURRENT_DATE)      -- drop the week in progress
+)
+SELECT a.merchant_id, a.wk
+FROM merchant_weeks a
+WHERE a.wk &lt; DATE_TRUNC('week', CURRENT_DATE) - INTERVAL '7' DAY
+  AND NOT EXISTS (SELECT 1 FROM merchant_weeks b
+                  WHERE b.merchant_id = a.merchant_id
+                    AND b.wk = a.wk + INTERVAL '7' DAY);</pre>
+<p>The marks: distinct merchant-weeks first; anti-join; <strong>exclude the incomplete week</strong> or everyone looks churned.</p>
+
+<h2>2. Did A but never B</h2>
+<p>NOT EXISTS or LEFT JOIN … IS NULL. <strong>Never NOT IN</strong> on a nullable column: one NULL in the list returns zero rows, silently.</p>
+
+<h2>3. Month-over-month growth</h2>
+<pre>SELECT city_tier, mon, value,
+       (value - LAG(value) OVER w) * 100.0 / NULLIF(LAG(value) OVER w, 0) AS mom_pct
+FROM monthly
+WINDOW w AS (PARTITION BY city_tier ORDER BY mon);</pre>
+<p>Edges: complete months only; LAG takes the previous <em>row</em>, so missing months need a calendar spine; skewed values deserve a median alongside.</p>
+
+<h2>4. Outliers: more than 2 standard deviations</h2>
+<pre>SELECT payment_id, merchant_id, amount
+FROM (
+  SELECT p.*,
+         AVG(amount)    OVER (PARTITION BY merchant_id) AS mu,
+         STDDEV(amount) OVER (PARTITION BY merchant_id) AS sd,
+         COUNT(*)       OVER (PARTITION BY merchant_id) AS n
+  FROM payments p WHERE status = 'success'
+) t
+WHERE n &gt;= 30 AND amount &gt; mu + 2 * sd;</pre>
+<p>Critique to volunteer: money is right-skewed (use log amounts, median/MAD or percentiles); the outlier inflates its own SD (use trailing history); output is candidates for review, not proof of fraud.</p>
+
+<h2>5. Weekly cohort retention</h2>
+<p>Cohort = signup week; week_n = <code>DATE_DIFF('week', cohort_week, DATE_TRUNC('week', created_at))</code>; retention = distinct active merchants ÷ <strong>full cohort size</strong> (including merchants who never recorded anything). Blank out cells a cohort has not reached yet. Say whether it is classic (exactly week N) or unbounded (week N or later) retention.</p>
+
+<h2>6. Also have ready</h2>
+<ul>
+<li>Top N per group: aggregate → rank in a CTE (ROW_NUMBER vs DENSE_RANK for ties) → filter outside.</li>
+<li>Second highest without LIMIT: DENSE_RANK = 2, or MAX below MAX.</li>
+<li>Threshold groups: GROUP BY … HAVING COUNT(*) &gt;= 5.</li>
+<li>Dedupe to latest version: ROW_NUMBER() OVER (PARTITION BY entry_id ORDER BY synced_at DESC) = 1.</li>
+<li>Running totals and consecutive streaks (gaps and islands).</li>
+</ul>
+
+<h2>7. Query optimisation (explicitly in the JD)</h2>
+<ol>
+<li><strong>Measure</strong>: EXPLAIN / query plan, bytes scanned, which step dominates.</li>
+<li><strong>Read less</strong>: filter the partition column directly (<code>dt BETWEEN '20260801' AND '20260831'</code>, not a function wrapped around it); select only needed columns.</li>
+<li><strong>Join less</strong>: pre-aggregate the big table before joining; check join keys have matching types; watch fan-out hidden by DISTINCT.</li>
+<li><strong>Structure</strong>: incremental models, partitioning and clustering, materialised summary tables for dashboards hit all day.</li>
+<li><strong>Re-measure</strong> and quote before/after.</li>
+</ol>
+
+<h1>PART 4 — PIPELINES: ELT, dbt, AIRFLOW</h1>
+
+<h2>1. ELT and the modern stack</h2>
+<p><strong>Extract/load</strong> with Airbyte (or CDC) into the warehouse raw layer → <strong>transform</strong> with dbt (staging → intermediate → marts) → <strong>orchestrate</strong> with Airflow → <strong>serve</strong> in Tableau / Power BI / Qlik. ELT won because cloud warehouse compute is cheap and keeping raw data lets you reprocess when logic changes. ETL still fits when PII must be masked before landing.</p>
+
+<h2>2. dbt in five lines</h2>
+<ul>
+<li>A <strong>model</strong> is a SELECT in a file; <code>ref()</code> and <code>source()</code> build the dependency graph and lineage.</li>
+<li><strong>Materialisations</strong>: view, table, incremental, ephemeral.</li>
+<li><strong>Tests</strong>: unique, not_null, accepted_values, relationships, plus custom SQL; freshness on sources.</li>
+<li><strong>Layers</strong>: stg_ (rename, cast, one per source) → int_ (joins, business logic) → fct_/dim_ (marts). BI reads only marts.</li>
+<li>dbt does <strong>not</strong> extract, load or schedule.</li>
+</ul>
+
+<h2>3. Incremental model for an offline ledger</h2>
+<pre>{{ config(materialized='incremental', unique_key='entry_id', incremental_strategy='merge') }}
+
+SELECT entry_id, merchant_id, amount, entry_type,
+       created_at, updated_at, synced_at, is_deleted
+FROM {{ source('raw', 'ledger_entries') }}
+{% if is_incremental() %}
+WHERE synced_at &gt; (SELECT MAX(synced_at) - INTERVAL '3' DAY FROM {{ this }})
+{% endif %}</pre>
+<p>Watermark on <strong>synced_at</strong> (late offline entries and edits), <strong>merge on unique key</strong> (edits overwrite), <strong>lookback overlap</strong> (clock skew), soft deletes kept as a flag, periodic full refresh.</p>
+
+<h2>4. Airflow essentials</h2>
+<ul>
+<li><strong>DAG</strong> of tasks; <strong>operators</strong> are task templates; dependencies set order; <strong>sensors</strong> wait for upstream data.</li>
+<li><strong>Retries with backoff, timeouts, SLAs, alerts.</strong></li>
+<li>Each run has a <strong>logical date / data interval</strong>; tasks use it, never now(), which makes backfills correct.</li>
+<li>Airflow orchestrates; heavy compute happens in the warehouse.</li>
+</ul>
+
+<h2>5. Idempotency and backfills</h2>
+<p><strong>"Re-running a load for the same day changes nothing."</strong> Overwrite the partition or delete-then-insert the date range; never blind append. Deterministic transforms. Backfill = the same task for a list of dates, throttled (max active runs), off-peak, validated by per-day counts and totals.</p>
+
+<h2>6. Data quality on a fact table</h2>
+<p>Unique grain key · not null keys · accepted values and ranges · referential integrity · freshness · volume anomalies · reconciliation to source of record. Grain/freshness failures <strong>block publishing</strong>: stale-but-correct beats fresh-but-wrong.</p>
+
+<h2>7. Reconciliation with Finance (named in the JD)</h2>
+<ol>
+<li>Understand timing: transaction time vs settlement date (T+1), cut-offs, UTC vs IST.</li>
+<li>Full outer join on gateway transaction id / UTR.</li>
+<li>Classify breaks: missing either side, amount mismatch, status mismatch, duplicates.</li>
+<li>Model refunds, reversals, fees/MDR, chargebacks explicitly.</li>
+<li>Control totals within tolerance; daily automated breaks table with ageing and owners.</li>
+</ol>
+
+<h2>8. Automating a manual report</h2>
+<p>Requirements and exact definitions (including undocumented Excel adjustments) → dbt models on certified sources → Airflow after upstream loads → quality gate → <strong>parallel run 2–3 weeks and reconcile every difference</strong> → deliver where users work → document, hand over, measure hours saved.</p>
+
+<h2>9. Schema changes and contracts</h2>
+<p>Lineage to find blast radius → fix forward in staging → data contracts with producers → source tests (accepted values catches new enums; schema change detection catches renames) → slim CI on every pull request → owners and alerts.</p>
+
+<h1>PART 5 — EXPERIMENTS AND CAUSAL REASONING</h1>
+
+<h2>1. A/B test for onboarding</h2>
+<ul>
+<li><strong>Primary metric: activation</strong> = first ledger entry within 24h / 7 days (not "completed onboarding screens").</li>
+<li><strong>Randomise</strong> new installs at user/device level on first launch; never by city or week.</li>
+<li><strong>Sample size</strong> from baseline and MDE at 80% power; <strong>whole weeks</strong>; no peeking.</li>
+<li><strong>Guardrails</strong>: D30 retention, uninstalls, OTP completion, support contacts.</li>
+<li><strong>Analysis</strong>: SRM check first; pre-registered segments (language, tier, device).</li>
+</ul>
+
+<h2>2. "Reminded customers pay faster" — so do reminders work?</h2>
+<p>Selection bias: engaged merchants remind, and they pick customers likely to pay. Fix with a <strong>randomised holdout</strong>, randomising at <strong>merchant level</strong> to avoid spillover. Measure <strong>incrementality</strong> (recovered amount at 30–60 days), not just speed (a timing shift is not extra money). Guardrails: opt-outs, spam complaints, WhatsApp blocks. Fallbacks: difference in differences, propensity matching, regression discontinuity.</p>
+
+<h2>3. Statistics you will be asked</h2>
+<ul>
+<li>p-value, confidence interval, Type I/II error, power; t-test vs chi-square vs Mann–Whitney.</li>
+<li>Mean vs median for skewed money data; z-scores and why they fail on skewed data.</li>
+<li>Simpson's paradox: mix shift across tiers or business types.</li>
+<li>Correlation vs causation; confounders; survivorship bias.</li>
+</ul>
+
+<h1>PART 6 — MERCHANT LENDING BASICS</h1>
+
+<h2>1. The model</h2>
+<p>Khatabook sources and services; RBI-registered <strong>NBFC partners</strong> lend from their own books. Under RBI's digital lending guidelines the platform is a <strong>lending service provider</strong>: the loan goes from the lender to the borrower's account, the borrower gets a Key Fact Statement with the all-in APR, data is collected only with consent, and any default loss guarantee a platform gives a lender is capped (5% of the portfolio). You do not need legal detail; you need to know <strong>partners carry the risk and rely on our data</strong>.</p>
+
+<h2>2. Using ledger data for credit</h2>
+<ol>
+<li><strong>Trust hierarchy</strong>: verified cash flow (QR, payment links, UPI) &gt; self-reported entries (can be gamed once merchants know they drive offers).</li>
+<li><strong>Stability</strong>: tenure, consistent active weeks, regularity — not a burst before applying.</li>
+<li><strong>Receivables health</strong>: outstanding udhaar vs collections, recovery rate, days to collect, customer concentration.</li>
+<li><strong>External</strong>: bureau, partner policy.</li>
+<li><strong>Validate</strong>: backtest on disbursed loans by vintage at equal months on book (30+ DPD separation).</li>
+<li><strong>Launch</strong>: pilot with small tickets, exposure cap, stop rules. EDI repayment gives an early read.</li>
+<li><strong>Traps</strong>: selection bias (repayment observed only for approved merchants), consent and regulation.</li>
+</ol>
+
+<h2>3. Risk metrics in one breath</h2>
+<p>Collection efficiency (collected ÷ due), EDI bounce rate, DPD buckets, FPD, roll rates between buckets, and <strong>vintage curves</strong>: group by disbursal month, plot delinquency by months on book, compare cohorts at the same age. A growing book always looks healthier in calendar terms because young loans have not had time to default.</p>
+<p><strong>"I would never show a blended default rate across cohorts of different ages; I would compare vintages at the same months on book."</strong></p>
+
+<h1>PART 7 — CULTURE AND BUSINESS-HEAD ROUNDS</h1>
+
+<h2>1. What they screen for</h2>
+<p>Khatabook does not publish a values framework like Navi OS. From founder interviews, job posts and candidate reports:</p>
+<table>
+<tr><th>Trait</th><th>What your story must show</th></tr>
+<tr><td>Merchant empathy</td><td>You designed for low-literacy, vernacular, low-end-phone, offline users, and checked with real users</td></tr>
+<tr><td>Ownership</td><td>You carried a problem across team boundaries to a result, without being asked</td></tr>
+<tr><td>Resilience &amp; agility</td><td>Priorities or resources changed; you re-planned, cut scope deliberately, automated, and delivered without complaining</td></tr>
+<tr><td>Comfort with messy data</td><td>You quantified the mess, decided what was good enough, stated caveats, fixed it upstream</td></tr>
+<tr><td>Business framing</td><td>You led with the so-what and a recommendation for a non-technical audience</td></tr>
+<tr><td>Integrity</td><td>You would not soften numbers, especially numbers a lending partner relies on</td></tr>
+</table>
+
+<h2>2. Story bank — six stories cover nearly everything</h2>
+<table>
+<tr><th>Story</th><th>Answers</th></tr>
+<tr><td>Raw data → decision with a measurable result</td><td>Most reported Khatabook behavioural question</td></tr>
+<tr><td>Pushed back on a senior stakeholder with data</td><td>Reported; also covers disagreement</td></tr>
+<tr><td>Delivered with messy or incomplete data</td><td>Comfort with messy data</td></tr>
+<tr><td>Priorities or team changed abruptly</td><td>Resilience and agility; lean team</td></tr>
+<tr><td>A data mistake you made and owned</td><td>Ownership, detail</td></tr>
+<tr><td>Automated a manual process / built a source of truth</td><td>The Central Analytics job itself</td></tr>
+</table>
+<p>Rules: STAR weighted ~55% on action; "I" not "we"; a number in every result; one line on what you would do differently. Know every decision in your own projects — Khatabook interviewers probe them hard.</p>
+
+<h2>3. Most likely business-head questions</h2>
+<ul>
+<li><strong>Three stakeholders, three KPIs</strong>: understand the goal behind each → place on the metric tree → quantify → check conflicts and guardrails → make the trade-off visible with the shared manager → commit and revisit.</li>
+<li><strong>Prioritising a backlog</strong>: RICE or impact/effort, impact defined via the north star; weigh requests by merchants affected, not loudness; compliance is a must-do; data quality and tech debt scored as risk reduction; measure after shipping.</li>
+<li><strong>Explain to a non-technical head</strong>: headline first → one chart → how sure you are (correlation vs causation) → recommendation and decision needed → appendix.</li>
+<li><strong>First 90 days</strong>: learn and reconcile one metric end to end → own a report or fact table and automate it → deliver one analysis that changes a decision; document throughout.</li>
+</ul>
+
+<h2>4. Why Khatabook (template)</h2>
+<p>The users (crores of small merchants, many first-time business-app users) → the data problem (turning ledger and collections behaviour into credit decisions) → the role (Central Analytics owns pipelines and fact tables, not just dashboards) → lean, ownership-heavy team → one observation from actually using the app → what you bring.</p>
+<p><strong>Homework</strong>: install the app, add a customer, record an udhaar entry, send yourself a reminder, look at the QR and loan screens.</p>
+<p><strong>Questions to ask them</strong>: which metrics does Central Analytics own end to end? What does the data stack look like day to day? What is the hardest analytical question right now? What does a strong first 90 days look like?</p>
+
+<h2>Revision sheet</h2>
+<ul>
+<li><strong>Khatabook</strong>: Bengaluru · Jan 2019 · Ravish Naresh and co-founders · digital bahi khata (udhaar/jama) · 5 crore+ downloads · ~8M+ monthly active merchants · free ledger + lending via NBFC partners + Biz Analyst SaaS · push to profitability.</li>
+<li><strong>North star</strong>: weekly active merchants recording entries, with activation, reminders, QR collections underneath.</li>
+<li><strong>Offline sync</strong>: event time vs sync time; provisional recent days; incremental on synced_at.</li>
+<li><strong>SQL must-haves</strong>: anti-joins (not NOT IN), LAG with PARTITION BY, top-N per group, z-score critique, cohort retention denominator, incomplete periods.</li>
+<li><strong>Pipelines</strong>: ELT, dbt layers and tests, incremental + lookback, idempotent backfills, quality gates, reconciliation with finance.</li>
+<li><strong>Lending</strong>: verified cash flow over typed entries; vintages at equal months on book; pilot with stop rules.</li>
+<li><strong>Every behavioural answer</strong>: situation, your actions, a number, a learning — in about 90 seconds.</li>
+</ul>
+
+<h2>Two-week plan</h2>
+<table>
+<tr><th>Days</th><th>Focus</th><th>Site topics</th></tr>
+<tr><td>1–3</td><td>SQL: joins, anti-joins, GROUP BY/HAVING, windows, CTEs, cohort and funnel queries</td><td>SQL, Khatabook Interview Questions (SQL ones)</td></tr>
+<tr><td>4–5</td><td>Query optimisation, pipelines, dbt, Airflow, reconciliation</td><td>ETL/ELT Pipelines, dbt &amp; Airflow; Data Design</td></tr>
+<tr><td>6–8</td><td>Merchant cases: engagement, north star, churn, adoption gaps, metric drops</td><td>Product Metrics, Cases &amp; RCA; Khatabook Interview Questions</td></tr>
+<tr><td>9–10</td><td>Experiments and statistics; reminders causal question</td><td>A/B Testing, Statistics</td></tr>
+<tr><td>11</td><td>Python/pandas EDA for a possible take-home</td><td>Python &amp; Pandas</td></tr>
+<tr><td>12–13</td><td>Brief, story bank, why Khatabook, mock rounds out loud</td><td>Khatabook Cultural Fit &amp; Business Round</td></tr>
+<tr><td>14</td><td>Light revision of this sheet; use the app once more; rest</td><td>—</td></tr>
+</table>
+
+</body>
+</html>

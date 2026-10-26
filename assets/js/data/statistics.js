@@ -1,6 +1,6 @@
 DAQ.registerTopic({
   id: 'statistics',
-  group: 'rest',
+  group: 'prep',
   name: 'Statistics & Probability',
   icon: '\uD83D\uDCC8',
   blurb: 'Distributions, CLT, confidence intervals, test selection, Bayes and the classic sampling traps.',
